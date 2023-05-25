@@ -1,15 +1,13 @@
 import { AlgoliaSearchIndex } from '@ircsignpost/signpost-base/dist/src/search-common';
 import { LatLngExpression } from 'leaflet';
 
-export const SITE_TITLE = 'TODO';
+export const SITE_TITLE = 'Signpost Test';
 
 // TODO: add the country id of the instance to fetch the data from the cms for the service-map;
-export const COUNTRY_ID = 123;
+export const COUNTRY_ID = 40;
 
 // TODO: add the default coords for the center of the map
-export const MAP_DEFAULT_COORDS: LatLngExpression = [
-  34.45830721078611, 65.09457416213823,
-];
+export const MAP_DEFAULT_COORDS: LatLngExpression = [47.4979, 19.0402];
 
 // Cache statically generated pages for 1 hour. The timeout was chosen
 // arbitrarily. Our website has static, non-urgent resources, so we probably do
@@ -19,7 +17,7 @@ export const REVALIDATION_TIMEOUT_SECONDS: number = 1 * 60 * 60;
 // The "about us" article ID.
 //
 // TODO
-export const ABOUT_US_ARTICLE_ID: number = 123;
+export const ABOUT_US_ARTICLE_ID: number = 8351993660701;
 
 // The information hierary of the website.
 // Set to true for the category -> section -> article hierarchy, similar to that of United for Ukraine.
@@ -31,7 +29,15 @@ export const USE_CAT_SEC_ART_CONTENT_STRUCTURE = false;
 // A mapping from category ID to a Material icon for that category.
 export const CATEGORY_ICON_NAMES: { [key: string]: string } = {
   /* TODO */
-  '123': 'home_work', // Placeholder
+  '7986310684829': 'flight_land',
+  '8020781986077': 'local_hospital',
+  '8021380361501': 'school',
+  '8021156416925': 'spa',
+  '8020959862685': 'train',
+  '8020915874717': 'favorite',
+  '8020543061277': 'home',
+  '8000000542109': 'description',
+  '7807042058269': 'info',
 };
 
 // A mapping from section ID to a Material icon for that section.
@@ -41,16 +47,16 @@ export const SECTION_ICON_NAMES: { [key: string]: string } = {
 };
 
 // A list of category IDs that the site should not display.
-export const CATEGORIES_TO_HIDE: number[] = [
-  /* TODO */
-];
+export const CATEGORIES_TO_HIDE: number[] = [8351908341533];
 
 // A map from a locale code to Zendesk locale id used for dynamic content translations.
 // https://developer.zendesk.com/api-reference/ticketing/account-configuration/locales/
 // Keep in sync with locales configured in /next.config.js.
 export const DYNAMIC_CONTENT_LOCALES: { [key: string]: number } = {
   'en-us': 1, // English locale id
-  // TODO: Add any other IDs needed
+  hu: 1009, // Hungarian locale id
+  ru: 27, // Russian locale id
+  uk: 1173, // Ukranian locale id
 };
 
 export const ZENDESK_AUTH_HEADER = {
