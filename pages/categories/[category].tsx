@@ -11,6 +11,7 @@ import {
   getArticle,
   getArticlesForSection,
   getCategories,
+  getCategorySection,
   getTranslationsFromDynamicContent,
 } from '@ircsignpost/signpost-base/dist/src/zendesk';
 import { GetStaticProps } from 'next';
@@ -86,7 +87,7 @@ export default function Category({
   const { publicRuntimeConfig } = getConfig();
 
   const handleSectionFilterChange = async (val: number) => {
-    const SECTION = await getSection(
+    const SECTION = await getCategorySection(
       currentLocale,
       getZendeskUrl(),
       val,
@@ -99,7 +100,7 @@ export default function Category({
 
   const handleSelectFilterChange = async (val: string) => {
     if (selectedSectionId) {
-      const SECTION = await getSection(
+      const SECTION = await getCategorySection(
         currentLocale,
         getZendeskUrl(),
         selectedSectionId,

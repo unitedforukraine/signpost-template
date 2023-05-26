@@ -28,7 +28,6 @@ export const USE_CAT_SEC_ART_CONTENT_STRUCTURE = false;
 
 // A mapping from category ID to a Material icon for that category.
 export const CATEGORY_ICON_NAMES: { [key: string]: string } = {
-  /* TODO */
   '7986310684829': 'flight_land',
   '8020781986077': 'local_hospital',
   '8021380361501': 'school',
@@ -78,9 +77,9 @@ export const ALGOLIA_SEARCH_API_KEY = '0d9093280e7b2bc2b6ca12ed4180fd0a';
 
 // TODO: create Algolia indexes for Articles and Queries and replace the names here.
 // See README for more info on how to create indexes.
-export const ALGOLIA_ARTICLE_INDEX_NAME = 'zendesk_signpost-test_articles';
+export const ALGOLIA_ARTICLE_INDEX_NAME = 'zendesk_refugeeinfohungary_articles';
 export const ALGOLIA_QUERY_INDEX_NAME =
-  'zendesk_signpost-test_articles_query_suggestions';
+  'zendesk_refugeeinfohungary_articles_query_suggestions';
 
 export const SEARCH_BAR_INDEX: AlgoliaSearchIndex = {
   appId: ALGOLIA_SEARCH_APP_ID,
