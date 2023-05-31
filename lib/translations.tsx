@@ -45,23 +45,21 @@ export const COMMON_DYNAMIC_CONTENT_PLACEHOLDERS = [
 export const HOME_PAGE_DYNAMIC_CONTENT_PLACEHOLDERS = [
   // Header banner and social media strings.
 
-  'ri_hungary_mission_statement',
+  'signpost_test_mission_statement',
   'default_banner_social_media_title',
   'default_banner_social_media_description',
   'default_banner_facebook_title',
   'default_banner_messenger_title',
   'default_banner_telegram_title',
-  'ri_hungary_facebook_link',
-  'ri_hungary_telegram_link',
-  'ri_hungary_messenger_link',
+  'signpost_test_facebook_link',
+  'signpost_test_telegram_link',
+  'signpost_test_messenger_link',
   // Main body strings.
   'default_information_title',
-  /*
+
   //TODO: Replace and create customized dynamic content for information description.
-  '<site_prefix>_information_description',
-  */
+  'signpost_test_information_description',
   'default_information_description',
-  'ri_hungary_information_description',
   'default_service_map_title',
   'default_service_map_description',
   'default_service_map_select_region',
@@ -109,15 +107,15 @@ export function populateSocialMediaLinks(dynamicContent: {
   return {
     facebookLink: {
       title: dynamicContent['default_banner_facebook_title'],
-      href: dynamicContent['ri_hungary_facebook_link'],
+      href: dynamicContent['signpost_test_facebook_link'],
     },
     messengerLink: {
       title: dynamicContent['default_banner_messenger_title'],
-      href: dynamicContent['ri_hungary_messenger_link'],
+      href: dynamicContent['signpost_test_messenger_link'],
     },
     telegramLink: {
       title: dynamicContent['default_banner_telegram_title'],
-      href: dynamicContent['ri_hungary_telegram_link'],
+      href: dynamicContent['signpost_test_telegram_link'],
     },
   };
 }
@@ -127,7 +125,7 @@ export function populateHeaderBannerStrings(dynamicContent: {
 }): HeaderBannerStrings {
   return {
     // TODO: replace welcomeTitle with website-specific Dynamic content ID.
-    welcomeTitle: dynamicContent['ri_hungary_mission_statement'],
+    welcomeTitle: dynamicContent['signpost_test_mission_statement'],
     socialMediaTitle: dynamicContent['default_banner_social_media_title'],
     socialMediaDescription:
       dynamicContent['default_banner_social_media_description'],
@@ -165,7 +163,7 @@ export function populateCategoriesSectionStrings(dynamicContent: {
 }): CardsListStrings {
   return {
     title: dynamicContent['default_information_title'],
-    description: dynamicContent['ri_hungary_information_description'],
+    description: dynamicContent['signpost_test_information_description'],
   };
 }
 

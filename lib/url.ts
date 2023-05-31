@@ -15,5 +15,5 @@ export function getZendeskUrl(): string {
 
 // @return Zendesk's mapped URL for the site, e.g., https://www.beporsed-ma-ra.org
 export function getZendeskMappedUrl(): string {
-  return process.env.ZENDESK_MAPPED_URL ?? 'https://www.TODO.com';
+  return process.env.ZENDESK_MAPPED_URL ?? 'https://signposttest.zendesk.com';
 }

@@ -11,20 +11,12 @@ import logo from '../public/refugeeinfo-hungary-logo.png';
 
 const langs: Lang[] = [
   {
-    langShort: 'hu',
-    langLong: 'Magyar',
-  },
-  {
     langShort: 'en-us',
     langLong: 'English',
   },
   {
-    langShort: 'ru',
-    langLong: 'Русский',
-  },
-  {
-    langShort: 'uk',
-    langLong: 'Українська',
+    langShort: 'es',
+    langLong: 'Spanish',
   },
 ];
 

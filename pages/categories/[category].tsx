@@ -1,6 +1,6 @@
 import CategoryPage, {
   CategoryStrings,
-  getSection,
+  getCategorySection,
   getSectionsForCategory,
 } from '@ircsignpost/signpost-base/dist/src/category-page';
 import CookieBanner from '@ircsignpost/signpost-base/dist/src/cookie-banner';
@@ -11,7 +11,6 @@ import {
   getArticle,
   getArticlesForSection,
   getCategories,
-  getCategorySection,
   getTranslationsFromDynamicContent,
 } from '@ircsignpost/signpost-base/dist/src/zendesk';
 import { GetStaticProps } from 'next';
