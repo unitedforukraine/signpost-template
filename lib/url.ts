@@ -10,10 +10,10 @@ export function getSiteUrl(): string {
 // @return The site's Zendesk effective URL, e.g., https://signpost-afghanistan.zendesk.com
 export function getZendeskUrl(): string {
   // If ZENDESK_URL is present, use that. Otherwise use Signpost global URL.
-  return process.env.ZENDESK_URL ?? 'https://signpost-global.zendesk.com';
+  return process.env.ZENDESK_URL ?? 'https://signposttest.zendesk.com';
 }
 
 // @return Zendesk's mapped URL for the site, e.g., https://www.beporsed-ma-ra.org
 export function getZendeskMappedUrl(): string {
-  return process.env.ZENDESK_MAPPED_URL ?? 'https://www.TODO.com';
+  return process.env.ZENDESK_MAPPED_URL ?? 'https://signposttest.zendesk.com';
 }
