@@ -1,3 +1,4 @@
+import React from 'react';
 import 'antd/dist/antd.less';
 import '../styles/globals.css';
 import 'leaflet/dist/leaflet.css';

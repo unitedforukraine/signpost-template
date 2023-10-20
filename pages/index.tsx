@@ -2,10 +2,12 @@ import { Directus } from '@directus/sdk';
 import CookieBanner from '@ircsignpost/signpost-base/dist/src/cookie-banner';
 import {
   getDirectusAccessibility,
+  getDirectusArticle,
   getDirectusArticles,
   getDirectusPopulationsServed,
   getDirectusProviders,
   getDirectusServiceCategories,
+  isSignpostService,
 } from '@ircsignpost/signpost-base/dist/src/directus';
 import { HeaderBannerStrings } from '@ircsignpost/signpost-base/dist/src/header-banner';
 import HomePage, {
@@ -29,6 +31,7 @@ import {
 import type { NextPage } from 'next';
 import { GetStaticProps } from 'next';
 import getConfig from 'next/config';
+import { useEffect } from 'react';
 
 import {
   ABOUT_US_ARTICLE_ID,
@@ -95,6 +98,10 @@ const Home: NextPage<HomeProps> = ({
   footerLinks,
 }) => {
   const { publicRuntimeConfig } = getConfig();
+
+  useEffect(() => {
+    console.log('AAAA ', serviceMapProps);
+  }, [serviceMapProps]);
 
   return (
     <HomePage
@@ -192,8 +199,14 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
   await directus.auth.static(DIRECTUS_AUTH_TOKEN);
 
   // const services = await fetchServices(COUNTRY_ID, currentLocale.url);
-  const services = await getDirectusArticles(DIRECTUS_COUNTRY_ID, directus);
-  services.sort((a, b) => a.name.normalize().localeCompare(b.name.normalize()));
+  const services = await getDirectusArticles(
+    DIRECTUS_COUNTRY_ID,
+    directus,
+    currentLocale.directus
+  );
+  services.sort((a, b) =>
+    a.name?.normalize().localeCompare(b.name?.normalize())
+  );
 
   const serviceTypes = await getDirectusServiceCategories(directus);
   const providers = await getDirectusProviders(directus, DIRECTUS_COUNTRY_ID);
@@ -218,6 +231,7 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
         populations,
         accessibility,
         showDirectus: true,
+        currentLocale,
       },
       categories,
       aboutUsTextHtml,
