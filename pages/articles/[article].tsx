@@ -172,7 +172,7 @@ export async function getStaticPaths() {
         locale,
       };
     }),
-    fallback: 'blocking',
+    fallback: true,
   };
 }
 
