@@ -6,13 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "postbuild": "next-sitemap --config next-sitemap.config.mjs",
-    "start": "next start",
-    "prepare": "husky install",
-    "lint": "next lint --max-warnings=0",
-    "cypress": "cypress open",
-    "cypress:headless": "cypress run",
-    "e2e": "start-server-and-test 'yarn dev --port 3003' :3003 cypress",
-    "e2e:headless": "start-server-and-test 'yarn dev --port 3003' :3003 cypress:headless"
+    "start": "next start"
   },
   "dependencies": {
     "@algolia/autocomplete-core": "^1.7.1",
@@ -44,33 +38,17 @@
     "usehooks-ts": "^2.6.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^17.1.2",
-    "@commitlint/config-conventional": "^17.1.0",
     "@directus/sdk": "^10.3.3",
-    "@trivago/prettier-plugin-sort-imports": "^3.3.0",
     "@types/leaflet": "^1.8.0",
     "@types/node": "18.7.17",
     "@types/react": "18.0.19",
     "@types/react-dom": "18.0.6",
-    "check-peer-dependencies": "^4.1.0",
-    "cypress": "^10.7.0",
-    "eslint": "^8.23.1",
-    "eslint-config-next": "^12.3.0",
-    "eslint-config-prettier": "^8.5.0",
-    "husky": "^8.0.1",
     "next-with-less": "^2.0.5",
     "postcss": "^8.4.16",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-preset-env": "^7.8.2",
-    "prettier": "^2.7.1",
-    "start-server-and-test": "^1.14.0",
     "tailwindcss": "^3.1.8",
     "typescript": "4.8.3",
     "webpack": "^5.74.0"
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
   }
 }

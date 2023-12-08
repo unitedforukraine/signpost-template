@@ -1,10 +1,14 @@
-const withLess = require('next-with-less');
-const pack = require('./package.json');
+const withLess = require('next-with-less')
+const pack = require('./package.json')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: false,
+  webpack: (config) => {
+    config.resolve.symlinks = false
+    return config
+  },
   // Keep in sync with locales configured in /lib/locale.ts.
   i18n: {
     locales: ['default', 'en-us', 'es'],
@@ -20,7 +24,7 @@ const nextConfig = {
         destination: '/:resource/:id',
         permanent: true,
       },
-    ];
+    ]
   },
   // TODO: add images url to whitelist them
   images: {
@@ -34,7 +38,7 @@ const nextConfig = {
   publicRuntimeConfig: {
     version: pack.dependencies['@ircsignpost/signpost-base'],
   },
-};
+}
 
 module.exports = withLess({
   ...nextConfig,
@@ -81,4 +85,4 @@ module.exports = withLess({
       },
     },
   },
-});
+})
