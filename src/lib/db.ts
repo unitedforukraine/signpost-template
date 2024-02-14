@@ -32,7 +32,8 @@ export class DB extends Dexie {
   async updateServices() {
     console.log("Updating Database...")
 
-    const services = await api.getServices(app.country)
+    // const services = await api.getServices(app.country)
+    const services = await api.getServices(2)
 
     if (services) {
       console.log(`Saving ${services.length} Services`)
