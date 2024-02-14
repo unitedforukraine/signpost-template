@@ -1,11 +1,8 @@
 import { blocks } from "./blocks"
+import { api } from "./api"
 import { DB } from "./db"
 import isEqual from "lodash/isEqual"
 
-
-const serverurl = "http://localhost:3000"
-type Statuses = "initializing" | "ready"
-let status: Statuses = "initializing"
 
 export const app = {
 
@@ -17,16 +14,28 @@ export const app = {
   db: new DB(),
   boot: false,
 
-  statusText: "Initalizing",
+  state: {
+    status: "initializing" as Statuses,
+    info: "Initalizing",
+    servicesLoaded: false,
+  },
 
   get status() {
-    return status
+    return app.state.status
   },
   set status(v: Statuses) {
-    if (status === v) return
+    if (app.state.status === v) return
     console.log(`Status Changed to ${v}`)
-    status = v
+    app.state.status = v
     app.update()
+  },
+
+  color: "#000000" as string,
+  bgcolor: "#ffffff" as string,
+
+  header: {
+    color: null as string,
+    bgcolor: null as string,
   },
 
   content: blocks,
@@ -45,6 +54,8 @@ export const app = {
     populations: {},
     accesibility: {},
   } as Categories,
+
+  services: {} as Services,
 
   update() {
     console.log("Update App: ", app)
@@ -66,64 +77,69 @@ export const app = {
     try { c = JSON.parse(storageCountry) } catch (error) { }
     try { cats = JSON.parse(storageCategories) } catch (error) { }
 
-    if (!c) {
+    if (cats) app.categories = cats
 
-      console.log("Country not Saved. Loading...")
-
-      c = await fetch(`${serverurl}/country/${app.country}`).then(r => r.json())
-      localStorage.setItem("country", JSON.stringify(c))
-      loadCountry(c)
-
-      app.statusText = "Loading Categories"
-      app.update()
-
-      cats = await fetch(`${serverurl}/categories`).then(r => r.json())
-      app.categories = cats
-      localStorage.setItem("categories", JSON.stringify(cats))
-
-      app.statusText = ""
-
-      app.status = "ready"
-
-
-    } else {
-
+    if (c) {
       loadCountry(c)
       app.status = "ready"
-
-      //Background Update
-      setTimeout(async () => {
-        console.log("Updating Country and Categories...")
-        const serverCountry = await fetch(`${serverurl}/country/${app.country}`).then(r => r.json())
-
-        if (!isEqual(c, serverCountry)) {
-          localStorage.setItem("country", JSON.stringify(serverCountry))
-          loadCountry(serverCountry)
-          app.update()
-          console.log("Country Updated.")
-        } else {
-          console.log("Country Unchanged")
-        }
-
-        cats = await fetch(`${serverurl}/categories`).then(r => r.json())
-
-        if (!isEqual(cats, app.categories)) {
-          localStorage.setItem("categories", JSON.stringify(cats))
-          app.categories = cats
-          app.update()
-          console.log("Categories Updated.")
-        } else {
-          console.log("Categories Unchanged")
-        }
-
-      }, 1)
-
     }
 
-    //ToDo:
-    // app.db.updateData()
+    setTimeout(async () => {
+
+      let serverCountry: Country = await api.getCountry(app.country)
+
+      if (serverCountry) {
+
+        if (!c) {
+          localStorage.setItem("country", JSON.stringify(serverCountry))
+          loadCountry(serverCountry)
+
+        } else {
+          if (!isEqual(c, serverCountry)) {
+            localStorage.setItem("country", JSON.stringify(serverCountry))
+            loadCountry(serverCountry)
+            console.log("Country Updated.")
+          } else {
+            console.log("Country Unchanged")
+          }
+        }
+
+        app.status = "ready"
+
+        const sc = await app.db.loadLocalServices()
+
+        if (sc > 0) {
+          console.log(`${sc} Services Cached`)
+          app.state.servicesLoaded = true
+          app.update()
+        }
+
+        await app.db.updateServices()
+
+        app.update()
+
+        console.log("Updating Categories...")
+        cats = await api.getCategories()
+
+        if (cats) {
+          app.categories = cats
+          localStorage.setItem("categories", JSON.stringify(cats))
+          if (!isEqual(cats, app.categories)) {
+            app.update()
+            console.log("Categories Updated.")
+          } else {
+            console.log("Categories Unchanged")
+          }
+        }
+
+
+
+      }
+
+    }, 1)
 
   },
+
 
   async getService(id: number) {
 
@@ -139,6 +155,13 @@ function loadCountry(c: Country) {
   app.locale ||= c.locale
   app.content = c.content || []
   app.defaultLocale = c.locale
+
+  app.color = c.pagecolor || "#000000"
+  app.bgcolor = c.pagebgcolor || "#ffffff"
+
+  app.header.color = c.headercolor || c.pagecolor
+  app.header.bgcolor = c.headerbgcolor || c.pagebgcolor
+
   const footer = c.content.find(b => b.type === "footer")
   if (footer) app.footer = footer as BlockFooter
 }
@@ -155,9 +178,23 @@ export async function sleep(ms = 1000) {
 }
 
 
-interface Country {
-  id?: number
-  name?: string
-  locale?: string
-  content: Blocks[]
+declare global {
+
+  type Services = { [index: number]: Service }
+
+  interface Country {
+    id?: number
+    name?: string
+    locale?: string
+    content: Blocks[]
+
+    pagecolor?: string
+    pagebgcolor?: string
+
+    headercolor?: string
+    headerbgcolor?: string
+  }
+
 }
+
+type Statuses = "initializing" | "ready"

@@ -9,9 +9,9 @@ export function Splash() {
     <div className="-mt-40">
       <img src={app.logo} height={80} />
     </div>
-    <div className="w-full text-center mt-8 tracking-[0.5rem] uppercase animate-pulse">
-      {app.statusText}
-    </div>
+    {/* <div className="w-full text-center mt-8 tracking-[0.5rem] uppercase animate-pulse">
+      {app.state.info}
+    </div> */}
     <div className="mt-10">
       <Loader size={72} width={12} />
     </div>
