@@ -7,7 +7,7 @@ export function App() {
   app.reactUpdate = useForceUpdate()
 
   app.initialize().then(() => {
-    console.log("Initialized")
+    // console.log("Initialized")
   })
 
   return <React.StrictMode>

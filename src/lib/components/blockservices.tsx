@@ -25,14 +25,10 @@ export function BlockServices(props: { block: BlockServices }) {
     },
   ]
 
-  const onChange = (key: string) => {
-    console.log(key)
-  }
-
   return <Container block={block} className="transition-all">
     <div className="text-4xl">{translate(props.block.title)}</div>
     <div className="text-2xl mt-4 opacity-50">{translate(props.block.subtitle)}</div>
-    {servicesLoaded && <Tabs defaultActiveKey="1" items={items} onChange={onChange} />}
+    {servicesLoaded && <Tabs defaultActiveKey="list" items={items} />}
     {!servicesLoaded && <div className="flex items-center justify-center my-16">
       <Loader size={72} width={12} className="bg-gray-500" />
     </div>}

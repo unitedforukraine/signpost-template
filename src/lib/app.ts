@@ -132,6 +132,7 @@ export const app = {
           }
         }
 
+        console.log("Initialized")
 
 
       }
