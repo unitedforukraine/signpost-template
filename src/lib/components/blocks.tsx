@@ -1,6 +1,7 @@
-import { Children } from "react"
+import { CSSProperties, Children } from "react"
 import { app } from "../app"
-import { BlockChannels, BlockImage, BlockInfo, BlockRichText, BlockServices, BlockText } from "."
+import { BlockChannels, BlockImage, BlockInfo, BlockRichText, BlockServices, BlockText, Footer } from "."
+import { Link } from "react-router-dom"
 
 export function Blocks() {
 
@@ -19,8 +20,23 @@ export function Blocks() {
   return <div className=" overflow-y-auto h-full w-full flex justify-center">
     <div>
       {blockview}
+      <Footer />
     </div>
   </div>
 
+}
+
+Blocks.buildStyle = (block: Block) => {
+
+  const styles: CSSProperties = {}
+
+  if (block) {
+    if (block.textsize) styles.fontSize = `${block.textsize}%`
+    if (block.textcolor) styles.color = block.textcolor
+    if (block.bgcolor) styles.backgroundColor = block.bgcolor
+    if (block.fontweight) styles.fontWeight = block.fontweight
+  }
+
+  return styles
 
 }

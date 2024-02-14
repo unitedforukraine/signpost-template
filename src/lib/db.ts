@@ -1,5 +1,7 @@
 import Dexie from "dexie"
 import { } from "./locale"
+import { api } from "./api"
+import { app } from "./app"
 
 export class DB extends Dexie {
   services!: Dexie.Table<Service, number>
@@ -8,13 +10,38 @@ export class DB extends Dexie {
   constructor() {
     super("db")
     this.version(1).stores({
-      contacts: 'id, status, date_created, date_updated, provider, city, region, *categories, *subcategories, *Accessibility, *Populations',
-      providers: 'id, category',
+      services: 'id, date_created, date_updated',
+      providers: 'id',
     })
+    this.services = this.table("services")
+    this.providers = this.table("providers")
   }
 
-  updateData() {
+  async loadLocalServices(): Promise<number> {
+    const dbs = (await this.services.toArray()) || []
+
+    if (dbs.length > 0) {
+      const r = dbs.reduce((a, b) => { a[b.id] = b; return a }, {})
+      app.services = r as any
+      console.log("Local Services: ", r)
+    }
+    return dbs.length
+
+  }
+
+  async updateServices() {
     console.log("Updating Database...")
+
+    const services = await api.getServices(app.country)
+
+    if (services) {
+      console.log(`Saving ${services.length} Services`)
+      for (const service of services) {
+        await this.services.put(service, service.id)
+      }
+    }
+
+    console.log("Database Updated!")
   }
 
 }
