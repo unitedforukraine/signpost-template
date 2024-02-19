@@ -1,6 +1,30 @@
-
 // const serverurl = "http://localhost:3000"
 const serverurl = "https://directus-qa-support.azurewebsites.net"
+
+interface Doc {
+  pageContent?: string
+  metadata: {
+    source?: string
+    title?: string
+    id?: number
+    loc?: {
+      lines?: {
+        from?: number
+        to?: number
+      }
+    }
+  }
+}
+
+declare global {
+  interface ChatMessage {
+    type: "human" | "bot"
+    message?: string
+    docs?: Doc[]
+    error?: string
+  }
+}
+
 
 export const api = {
 
@@ -44,5 +68,28 @@ export const api = {
 
     return cats
   },
+
+  async askbot(id: number, message: string) {
+
+    let a: ChatMessage = null
+
+    let options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message })
+    }
+
+
+    try {
+      a = await fetch(`${serverurl}/ai/${message}`, options).then(r => r.json())
+    } catch (error) {
+      console.log("Error Contacting Bot", error)
+    }
+
+    return a
+  },
+
 
 }

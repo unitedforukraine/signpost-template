@@ -114,7 +114,9 @@ export const app = {
           app.update()
         }
 
+
         await app.db.updateServices()
+        app.state.servicesLoaded = true
 
         app.update()
 

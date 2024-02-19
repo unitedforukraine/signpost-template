@@ -15,9 +15,11 @@ html {
 }
 
 .service {
-  span {
-    font-family: inherit !important;
-  }
+  font-family: inherit !important;
+}
+
+.service span {
+  font-family: inherit !important;
 }
 
 #root {
@@ -49,7 +51,7 @@ html {
 .whitedots {
   /* width: 60px; */
   aspect-ratio: 2;
-  --_g: no-repeat radial-gradient(circle closest-side, #ffffff 90%, #0000);
+  --_g: no-repeat radial-gradient(circle closest-side, #000000 90%, #0000);
   background:
     var(--_g) 0% 50%,
     var(--_g) 50% 50%,
