@@ -11,7 +11,14 @@ export function App() {
   })
 
   return <React.StrictMode>
-    <div className="w-full h-full">
+    <div className="grid h-full grid-rows-1 grid-cols-1">
+      <Splash />
+      <Page />
+    </div>
+  </React.StrictMode >
+
+  return <React.StrictMode>
+    <div className="h-full">
       <Splash />
       <Page />
     </div>

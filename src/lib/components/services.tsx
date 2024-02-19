@@ -20,7 +20,7 @@ export function ServicesList() {
   }
 
   return <div>
-    {visibleServices.map(s => <Service service={s} />)}
+    {visibleServices.map(s => <Service key={s.id} service={s} />)}
     <Pagination
       className="mt-8"
       defaultCurrent={1}
