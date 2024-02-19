@@ -20,9 +20,14 @@ export function Header() {
     <div className="flex gap-4">
       <div className="">Home</div>
       <div className="">Services</div>
-      <div className="">Information <span className="text-[0.60rem]">▼</span></div>
-      <div className="">About <span className="text-[0.60rem]">▼</span></div>
-      <div className="">English <span className="text-[0.60rem]">▼</span></div>
+      <div className="">Information<span className="text-[0.60rem]">▼</span></div>
+      <div className="">About<span className="text-[0.60rem]">▼</span></div>
+      <div className="">
+        <Link to={"/signpostbot"}>
+          <div className="text-white no-underline">Bot</div>
+        </Link>
+      </div>
+      <div className="">English<span className="text-[0.60rem]">▼</span></div>
     </div>
   </div>
 }
