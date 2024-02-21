@@ -1,4 +1,4 @@
-import { Input } from "antd"
+import { Button, Input } from "antd"
 const { Search } = Input
 import { MdSend } from "react-icons/md"
 import { BsRobot } from "react-icons/bs"
@@ -22,22 +22,28 @@ export function AIBot() {
   const onSend = async (message: string) => {
     message ||= "what is kobo forms?"
     if (!message) return
-    console.log(message)
     messages.current.unshift({ type: "human", message })
     setIsSending(true)
-    const response = await api.askbot(1, message)
-    response.type = "bot"
-    console.log(response)
+    const response = await api.askbot({
+      id: 1,
+      message
+    })
     messages.current.unshift(response)
     setIsSending(false)
   }
 
-  return <div
-    className="bg-white text-black grid grid-rows-3 grid-cols-1 p-4 relative"
-    style={{ gridTemplateRows: "auto 1fr auto", }}
-  >
-    <div className="-mt-6 -mb-2 ml-1">
+  const onRebuild = async () => {
+    setIsSending(true)
+    const response = await api.askbot({ command: "rebuild" })
+    messages.current.unshift(response)
+    setIsSending(false)
+    console.log(response)
+  }
+
+  return <div className="bg-white text-black grid grid-rows-3 grid-cols-1 p-4 relative" style={{ gridTemplateRows: "auto 1fr auto", }}>
+    <div className="-mt-6 -mb-2 ml-1 flex items-center">
       <h2>Signpost Bot</h2>
+      <div className="ml-auto"><Button loading={isSending} onClick={onRebuild} type="primary">Rebuild KB</Button></div>
     </div>
     <div className="relative">
       <div className="absolute top-0 right-0 left-0 bottom-0 overflow-y-auto border border-solid border-gray-300 p-4 flex flex-col-reverse" >

@@ -16,7 +16,7 @@ export function Header() {
         <img src={app.logo} height={40} />
       </Link>
     </div>
-    <div className="flex-grow"></div>
+    <div className="flex-grow" />
     <div className="flex gap-4">
       <div className="">Home</div>
       <div className="">Services</div>

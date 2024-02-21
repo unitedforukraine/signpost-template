@@ -1,5 +1,5 @@
-// const serverurl = "http://localhost:3000"
-const serverurl = "https://directus-qa-support.azurewebsites.net"
+const serverurl = "http://localhost:3000"
+// const serverurl = "https://directus-qa-support.azurewebsites.net"
 
 interface Doc {
   pageContent?: string
@@ -17,12 +17,16 @@ interface Doc {
 }
 
 declare global {
+
   interface ChatMessage {
-    type: "human" | "bot"
+    type?: "human" | "bot"
+    id?: number
     message?: string
     docs?: Doc[]
     error?: string
+    command?: "rebuild" | null
   }
+
 }
 
 
@@ -69,24 +73,29 @@ export const api = {
     return cats
   },
 
-  async askbot(id: number, message: string) {
+  async askbot(req: ChatMessage) {
 
-    let a: ChatMessage = null
+    let a: ChatMessage = {} as any
+
 
     let options = {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ message })
+      body: JSON.stringify(req)
     }
-
 
     try {
-      a = await fetch(`${serverurl}/ai/${message}`, options).then(r => r.json())
+      a = await fetch(`${serverurl}/ai/`, options).then(r => r.json())
     } catch (error) {
+      a.error = error?.toString() ?? "Error"
       console.log("Error Contacting Bot", error)
     }
+
+    if (a.error) a.message = a.error
+
+    a.type = "bot"
 
     return a
   },
