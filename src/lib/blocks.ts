@@ -1,9 +1,3 @@
-import { BlockText } from "."
-
-const isBlockText = (b: Block): b is BlockText => b.type == "text"
-const isBlockRichText = (b: Block): b is BlockText => b.type == "richtext"
-const isBlockServices = (b: Block): b is BlockText => b.type == "services"
-const isBlockChannels = (b: Block): b is BlockText => b.type == "channels"
 
 declare global {
 
@@ -114,7 +108,11 @@ export const blocks: Block[] = [
   } satisfies BlockRichText,
 ] as Block[]
 
+
 export { }
 
-
+const isBlockText = (b: Block): b is BlockText => b.type == "text"
+const isBlockRichText = (b: Block): b is BlockText => b.type == "richtext"
+const isBlockServices = (b: Block): b is BlockText => b.type == "services"
+const isBlockChannels = (b: Block): b is BlockText => b.type == "channels"
 
