@@ -12,5 +12,5 @@ export * from "./blockchannels"
 export * from "./blockinfo"
 export * from "./blockimage"
 export * from "./blocks"
-export * from "./bot"
+export * from "../bot/bot"
 
