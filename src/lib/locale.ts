@@ -14,6 +14,8 @@ interface LocaleDeclaration {
   name: string
 }
 
+
+
 export const langauages = {
   "ar-SA": {
     rtl: true,

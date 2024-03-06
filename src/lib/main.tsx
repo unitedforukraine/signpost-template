@@ -17,11 +17,5 @@ export function App() {
     </div>
   </React.StrictMode >
 
-  return <React.StrictMode>
-    <div className="h-full">
-      <Splash />
-      <Page />
-    </div>
-  </React.StrictMode>
 }
 
