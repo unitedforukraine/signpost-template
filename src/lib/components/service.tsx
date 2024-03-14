@@ -7,11 +7,12 @@ export function Service() {
   let { id } = useParams()
 
   //ToDo: update the content in useEffect
-  const s = app.services[id]
+  const s: Service = app.services[id]
 
   if (!s) {
     return <div>Service {id} not found</div>
   }
+
 
   const title = translate(s.name)
   const description = translate(s.description)
