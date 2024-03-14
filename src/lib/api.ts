@@ -33,6 +33,8 @@ declare global {
     question?: string
   }
 
+  type AI_SCORES = "pass" | "fail" | "redflag"
+
 }
 
 
@@ -66,7 +68,7 @@ export const api = {
     return c
   },
 
-  async getProviders(id:number): Promise<Provider[]> {
+  async getProviders(id: number): Promise<Provider[]> {
     let c: Provider[] = null
 
     try {
@@ -146,11 +148,11 @@ export const api = {
     return answer
   },
 
-  async qualifyBot(id: number, positive: boolean, reporter: string, result: string, question: string, answer: string) {
+  async qualifyBot(id: number, score: AI_SCORES, reporter: string, result: string, question: string, answer: string) {
 
     const r = {
       id,
-      positive,
+      score,
       reporter,
       result,
       question,
@@ -175,3 +177,4 @@ export const api = {
 
 
 }
+
