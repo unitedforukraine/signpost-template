@@ -1,5 +1,5 @@
-import type { TabsProps } from 'antd'
-import { Button, Input, Modal } from "antd"
+import type { SelectProps, TabsProps } from 'antd'
+import { Button, Input, Modal, Select } from "antd"
 import { useEffect, useState } from "react"
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { FaThumbsDown, FaThumbsUp, FaFlag } from "react-icons/fa"
@@ -77,9 +77,61 @@ export function BotChatMessage(props: { m: ChatMessage, isWaiting: boolean, rebu
 
 type Inputs = {
   reporter: string
+  sfr: string[]
+  qmf: string[]
   expectedResult: string
 }
 
+
+const failOptions: SelectProps['options'] = [
+  {
+    value: "Bias",
+    label: "Bias",
+  },
+  {
+    value: "Malicious",
+    label: "Malicious",
+  },
+  {
+    value: "Discrimination",
+    label: "Discrimination",
+  },
+  {
+    value: "Security Risk",
+    label: "Security Risk",
+  },
+  {
+    value: "Privacy",
+    label: "Privacy",
+  },
+  {
+    value: "Ethical Concern",
+    label: "Ethical Concern",
+  },
+  {
+    value: "Displacement",
+    label: "Displacement",
+  },
+  {
+    value: "Social Manipulation",
+    label: "Social Manipulation",
+  }
+]
+
+const qmf: SelectProps['options'] = [
+  {
+    value: "Trauma Informed",
+    label: "Trauma Informed",
+  },
+  {
+    value: "Client Centered",
+    label: "Client Centered",
+  },
+  {
+    value: "Safety / Do no Harm",
+    label: "Safety / Do no Harm",
+  }
+]
 
 function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void, score?: AI_SCORES }) {
 
@@ -89,7 +141,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
   const { register, handleSubmit, clearErrors, formState: { errors }, trigger, control, resetField } = useForm<Inputs>()
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    await api.qualifyBot(id, score, data.reporter, data.expectedResult, m.question, m.message)
+    await api.qualifyBot(id, score, data.reporter, data.expectedResult, m.question, m.message, data.sfr || [], data.qmf || [])
   }
 
   const handleOk = async () => {
@@ -109,9 +161,11 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
   const onCloseForm = () => {
     clearErrors()
     resetField("expectedResult")
+    resetField("sfr")
   }
 
   const title = score == "fail" ? "Qualify Negative" : score == "pass" ? "Qualify Positive" : "Red Flag"   //{`${botName} - ${positive ? 'Qualify Positive' : 'Qualify Negative'}`}
+  const isFail = score == "fail" || score == "redflag"
 
   return <Modal
     title={`${botName} - ${title}`}
@@ -135,8 +189,41 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
         {errors.reporter && <span className='text-red-500'>This field is required</span>}
       </div>
 
+      {isFail && <div >
+        <div className='font-medium mb-1'>Red Team Metrics Flag</div>
+        <Controller
+          name="sfr"
+          control={control}
+          render={({ field }) => <Select
+            mode="multiple"
+            className="w-full"
+            placeholder="Please select"
+            options={failOptions}
+            {...field}
+          />
+          }
+        />
+      </div>}
+
+      {isFail && <div >
+        <div className='font-medium mb-1'>Quality Metric Flag</div>
+        <Controller
+          name="qmf"
+          control={control}
+          render={({ field }) => <Select
+            mode="multiple"
+            className="w-full"
+            placeholder="Please select"
+            options={qmf}
+            {...field}
+          />
+          }
+        />
+      </div>}
+
+
       <div>
-        <div className='font-medium mb-1'>Expected Result</div>
+        <div className='font-medium mb-1'>Comments</div>
         <Controller
           name="expectedResult"
           control={control}
@@ -145,6 +232,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
         />
         {errors.expectedResult && <span className='text-red-500'>This field is required</span>}
       </div>
+
 
     </div>
 
