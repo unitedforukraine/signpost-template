@@ -1,5 +1,5 @@
-// const serverurl = "http://localhost:3000"
-const serverurl = "https://directus-qa-support.azurewebsites.net"
+const serverurl = "http://localhost:3000"
+// const serverurl = "https://directus-qa-support.azurewebsites.net"
 
 interface Doc {
   pageContent?: string
@@ -148,7 +148,7 @@ export const api = {
     return answer
   },
 
-  async qualifyBot(id: number, score: AI_SCORES, reporter: string, result: string, question: string, answer: string) {
+  async qualifyBot(id: number, score: AI_SCORES, reporter: string, result: string, question: string, answer: string, failtype: string[], qualitymetrics: string[]) {
 
     const r = {
       id,
@@ -157,6 +157,8 @@ export const api = {
       result,
       question,
       answer,
+      failtype,
+      qualitymetrics,
     }
 
     let options = {
