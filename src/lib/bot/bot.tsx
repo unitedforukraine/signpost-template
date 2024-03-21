@@ -42,8 +42,9 @@ export function AIBot() {
   ])
 
   const onSend = async (message: string) => {
-    message ||= "what is kobo forms?"
+    // message ||= "what is kobo forms?"
     // message ||= "how do I get a passport in Iraq?"
+    message ||= "What documents do I need to work in Greece?"
     if (!message) return
     messages.current.unshift({ type: "human", message })
     setIsSending(true)
