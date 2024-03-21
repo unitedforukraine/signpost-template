@@ -115,7 +115,12 @@ const failOptions: SelectProps['options'] = [
   {
     value: "Social Manipulation",
     label: "Social Manipulation",
+  },
+  {
+    value: "Other",
+    label: "Other",
   }
+
 ]
 
 const qmf: SelectProps['options'] = [
@@ -130,6 +135,10 @@ const qmf: SelectProps['options'] = [
   {
     value: "Safety / Do no Harm",
     label: "Safety / Do no Harm",
+  },
+  {
+    value: "Other",
+    label: "Other",
   }
 ]
 
@@ -166,6 +175,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
 
   const title = score == "fail" ? "Qualify Negative" : score == "pass" ? "Qualify Positive" : "Red Flag"   //{`${botName} - ${positive ? 'Qualify Positive' : 'Qualify Negative'}`}
   const isFail = score == "fail" || score == "redflag"
+  const required = score == "fail"
 
   return <Modal
     title={`${botName} - ${title}`}
@@ -194,6 +204,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
         <Controller
           name="sfr"
           control={control}
+          rules={{ required }}
           render={({ field }) => <Select
             mode="multiple"
             className="w-full"
@@ -210,6 +221,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
         <Controller
           name="qmf"
           control={control}
+          rules={{ required }}
           render={({ field }) => <Select
             mode="multiple"
             className="w-full"
