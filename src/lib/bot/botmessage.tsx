@@ -199,7 +199,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
         {errors.reporter && <span className='text-red-500'>This field is required</span>}
       </div>
 
-      {isFail && <div >
+      {isFail && <div>
         <div className='font-medium mb-1'>Red Team Metrics Flag</div>
         <Controller
           name="sfr"
@@ -214,6 +214,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
           />
           }
         />
+        {required && errors.sfr && <span className='text-red-500'>This field is required</span>}
       </div>}
 
       {isFail && <div >
@@ -231,6 +232,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
           />
           }
         />
+        {required && errors.qmf && <span className='text-red-500'>This field is required</span>}
       </div>}
 
 
