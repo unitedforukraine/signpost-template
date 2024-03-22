@@ -11,24 +11,29 @@ import { useForceUpdate, useMultiState } from "../components"
 import { BotChatMessage } from './botmessage'
 import type { TabsProps } from 'antd'
 
-export function AIBot() {
+interface Bots {
+  [index: number]: {
+    name: string
+    id: string
+    history: BotHistory[]
+  }
+}
 
-  const [isSending, setIsSending] = useState(false)
+export function AIBot() {
 
   const [state, setState] = useMultiState({
     isSending: false,
     rebuilding: false,
     loadingBotList: false,
-    // bots: [] as SelectProps['options'],
-    bots: {} as { [index: number]: string },
+    bots: {} as Bots,
     selectedBots: [] as number[],
   })
 
   useEffect(() => {
     api.getBots().then((sb) => {
-      const bots = {}
+      const bots: Bots = {}
       for (const value in sb) {
-        bots[value] = sb[value]
+        bots[value] = { name: sb[value], id: value, history: [] }
       }
       setState({ bots })
     })
@@ -42,35 +47,64 @@ export function AIBot() {
   ])
 
   const onSend = async (message: string) => {
+
     // message ||= "what is kobo forms?"
     // message ||= "how do I get a passport in Iraq?"
     message ||= "What documents do I need to work in Greece?"
-    if (!message) return
-    messages.current.unshift({ type: "human", message })
-    setIsSending(true)
-    const id = 1
 
-    const response = await api.askbot({ id, message }, state.selectedBots.map(b => ({ label: state.bots[b], value: b })))
+    if (!message) return
+
+    const selectedBots = state.selectedBots.map(b => ({ label: state.bots[b].name, value: b, history: state.bots[b].history }))
+
+    messages.current.unshift({ type: "human", message })
+    setState({ isSending: true })
+
+    const response = await api.askbot({ message }, selectedBots)
+
+    if (!response.error) {
+      for (const m of response.messages) {
+        const rbot = state.bots[m.id]
+        if (!rbot) continue
+        const messageRegistered = rbot.history.find(h => h.message == message && h.isHuman)
+        if (!messageRegistered) rbot.history.push({ isHuman: true, message })
+        if (!m.needsRebuild && !m.error) {
+          const messageRegistered = rbot.history.find(h => h.message == m.message && !h.isHuman)
+          if (!messageRegistered) rbot.history.push({ isHuman: false, message: m.message })
+        }
+      }
+    }
 
     response.rebuild = async () => {
-      setIsSending(true)
+      setState({ isSending: true })
       response.needsRebuild = false
-      await onRebuild(id)
-      setIsSending(false)
+      await onRebuild()
+      setState({ isSending: false })
     }
+
     messages.current.unshift(response)
-    setIsSending(false)
+    setState({ isSending: false })
   }
 
-  const onRebuild = async (id?: number) => {
-    setIsSending(true)
-    const response = await api.askbot({ command: "rebuild", id }, state.selectedBots.map(b => ({ label: state.bots[b], value: b })))
+  const onRebuild = async () => {
+    setState({ isSending: true })
+    const selectedBots = state.selectedBots.map(b => ({ label: state.bots[b].name, value: b, history: state.bots[b].history }))
+    const response = await api.askbot({ command: "rebuild", }, selectedBots)
     messages.current.unshift(response)
-    setIsSending(false)
+    setState({ isSending: false })
   }
 
   const onSelectBot = (e: string[]) => {
-    setState({ selectedBots: e.map(Number) })
+    const bots = e.map(Number)
+
+    for (const b of bots) {
+      const bot = state.bots[b]
+      if (!bot) continue
+      if (state.selectedBots.includes(b)) continue
+      state.selectedBots.push(b)
+      bot.history = []
+    }
+
+    setState({ selectedBots: bots })
   }
 
   const hasSelectedBots = state.selectedBots.length > 0
@@ -84,28 +118,26 @@ export function AIBot() {
           mode="multiple"
           className="w-full"
           placeholder="Please select"
+          disabled={state.isSending}
           onChange={onSelectBot}
-          options={Object.keys(state.bots).map(k => ({ label: state.bots[k], value: k }))}
+          options={Object.keys(state.bots).map(k => ({ label: state.bots[k].name, value: k }))}
           loading={Object.values(state.bots).length == 0}
         />
-      </div>
-      <div>
-        {/* <Button loading={isSending} onClick={onRebuild} type="primary">Rebuild KB</Button> */}
       </div>
     </div>
     <div className="relative">
       <div className="absolute top-0 right-0 left-0 bottom-0 overflow-y-auto border border-solid border-gray-300 p-4 flex flex-col-reverse" >
-        {isSending &&
+        {state.isSending &&
           <div className="flex mt-8">
             <BsRobot size={24} className="text-indigo-500" />
             <div className="whitedots h-4 w-4  ml-2 mt-1" />
           </div>
         }
-        {messages.current.map((m, i) => <ChatMessage key={i} message={m} isWaiting={isSending} />)}
+        {messages.current.map((m, i) => <ChatMessage key={i} message={m} isWaiting={state.isSending} />)}
       </div>
     </div>
     {hasSelectedBots && <div className="mt-4">
-      <SearchInput onSearch={onSend} disabled={isSending} />
+      <SearchInput onSearch={onSend} disabled={state.isSending} />
     </div>}
     {!hasSelectedBots && <div className="mt-4 flex justify-center">
       Please Select one or more bots
@@ -178,8 +210,6 @@ function ChatMessage(props: MessageProps) {
         </div>}
       </div>
     </div>
-
-
   }
 
   return <div className="mt-8">

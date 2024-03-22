@@ -34,8 +34,13 @@ declare global {
   }
 
   type AI_SCORES = "pass" | "fail" | "redflag"
+  interface BotHistory {
+    isHuman: boolean
+    message: string
+  }
 
 }
+
 
 
 export const api = {
@@ -107,7 +112,9 @@ export const api = {
 
   },
 
-  async askbot(req: ChatMessage, bots: { label: string, value: number }[]) {
+  async askbot(req: ChatMessage, bots: { label: string, value: number, history: BotHistory[] }[]) {
+
+    console.log("Request: ", bots)
 
     let answer: ChatMessage = {
       type: "bot",
@@ -121,7 +128,7 @@ export const api = {
 
       let a: ChatMessage = {}
 
-      const breq = { ...req, id: b.value }
+      const breq = { ...req, id: b.value, history: b.history }
 
       let options = {
         method: "POST",
