@@ -1,26 +1,23 @@
-import { blocks } from "./blocks"
 import { api } from "./api"
 import { DB } from "./db"
+import "./types.data"
+import "./types.ai"
 import isEqual from "lodash/isEqual"
 
 type Statuses = "initializing" | "ready"
 
-declare global {
-
-  type Services = { [index: number]: Service }
-
-  interface Country {
-    id?: number
-    name?: string
-    locale?: string
-    content: Blocks[]
-    pagecolor?: string
-    pagebgcolor?: string
-    headercolor?: string
-    headerbgcolor?: string
-  }
-
+const appPrivateData = {
+  status: "initializing" as Statuses,
+  servicesLoaded: false,
+  boot: false,
 }
+
+const defaultBlocks: Block[] = [
+  {
+    type: "text",
+    text: { "en-US": "Welcome" }
+  } satisfies BlockText,
+] as Block[]
 
 
 export const app = {
@@ -31,53 +28,65 @@ export const app = {
   name: "Country Name",
   defaultLocale: "en-US", //default lang of the country
   db: new DB(),
-  boot: false,
 
   state: {
-    status: "initializing" as Statuses,
+    get status() {
+      return appPrivateData.status
+    },
+    set status(v: Statuses) {
+      if (appPrivateData.status === v) return
+      appPrivateData.status = v
+      app.update()
+    },
+
     info: "Initalizing",
-    servicesLoaded: false,
+
+    get servicesLoaded() {
+      return appPrivateData.servicesLoaded
+    },
+    set servicesLoaded(v) {
+      if (appPrivateData.servicesLoaded === v) return
+      appPrivateData.servicesLoaded = v
+      app.update()
+    },
+
   },
 
-  get status() {
-    return app.state.status
+  page: {
+    color: "#000000",
+    bgcolor: "#ffffff",
+
+    header: {
+      color: null as string,
+      bgcolor: null as string,
+    },
+
+    footer: {
+      text: { "en-US": "Footer" },
+      footerlinks: []
+    } as BlockFooter,
+
+    content: [...defaultBlocks],
+
   },
-  set status(v: Statuses) {
-    if (app.state.status === v) return
-    console.log(`Status Changed to ${v}`)
-    app.state.status = v
-    app.update()
+
+  data: {
+
+    categories: {
+      providers: {},
+      categories: {},
+      subCategories: {},
+      populations: {},
+      accesibility: {},
+    } as Categories,
+
+    services: {} as Services,
+
   },
-
-  color: "#000000",
-  bgcolor: "#ffffff",
-
-  header: {
-    color: null as string,
-    bgcolor: null as string,
-  },
-
-  content: blocks,
-
-  footer: {
-    type: "footer",
-    text: { "en-US": "Footer" },
-    footerlinks: []
-  } as BlockFooter,
-
-
-  categories: {
-    providers: {},
-    categories: {},
-    subCategories: {},
-    populations: {},
-    accesibility: {},
-  } as Categories,
-
-  services: {} as Services,
 
 
   reactUpdate: null as Function,
+
   update() {
     console.log("Update App: ", app)
     if (app.reactUpdate) app.reactUpdate()
@@ -85,8 +94,8 @@ export const app = {
 
 
   async initialize() {
-    if (app.boot) return
-    app.boot = true
+    if (appPrivateData.boot) return
+    appPrivateData.boot = true
 
     const storageCountry = localStorage.getItem("country")
     const storageCategories = localStorage.getItem("categories")
@@ -97,11 +106,11 @@ export const app = {
     try { c = JSON.parse(storageCountry) } catch (error) { }
     try { cats = JSON.parse(storageCategories) } catch (error) { }
 
-    if (cats) app.categories = cats
+    if (cats) app.data.categories = cats
 
     if (c) {
       loadCountry(c)
-      app.status = "ready"
+      app.state.status = "ready"
     }
 
     setTimeout(async () => {
@@ -124,24 +133,21 @@ export const app = {
           }
         }
 
-        app.status = "ready"
+        app.state.status = "ready"
 
         const sc = await app.db.loadLocalServices()
         const pc = await app.db.loadLocalProviders()
 
         if (sc > 0) {
-          console.log(`${sc} Services Cached`)
           app.state.servicesLoaded = true
           app.update()
         }
 
         if (pc > 0) {
-          console.log(`${pc} Services Cached`);
           app.update()
         }
 
         await app.db.updateProviders()
-
         await app.db.updateServices()
         app.state.servicesLoaded = true
 
@@ -151,9 +157,9 @@ export const app = {
         cats = await api.getCategories()
 
         if (cats) {
-          app.categories = cats
+          app.data.categories = cats
           localStorage.setItem("categories", JSON.stringify(cats))
-          if (!isEqual(cats, app.categories)) {
+          if (!isEqual(cats, app.data.categories)) {
             app.update()
             console.log("Categories Updated.")
           } else {
@@ -162,7 +168,6 @@ export const app = {
         }
 
         console.log("Initialized")
-
 
       }
 
@@ -183,17 +188,17 @@ function loadCountry(c: Country) {
   app.country = c.id
   app.name = c.name
   app.locale ||= c.locale
-  app.content = c.content || []
+  app.page.content = c.content || []
   app.defaultLocale = c.locale
 
-  app.color = c.pagecolor || "#000000"
-  app.bgcolor = c.pagebgcolor || "#ffffff"
+  app.page.color = c.pagecolor || "#000000"
+  app.page.bgcolor = c.pagebgcolor || "#ffffff"
 
-  app.header.color = c.headercolor || c.pagecolor
-  app.header.bgcolor = c.headerbgcolor || c.pagebgcolor
+  app.page.header.color = c.headercolor || c.pagecolor
+  app.page.header.bgcolor = c.headerbgcolor || c.pagebgcolor
 
   const footer = c.content.find(b => b.type === "footer")
-  if (footer) app.footer = footer as BlockFooter
+  if (footer) app.page.footer = footer as BlockFooter
 }
 
 export function translate(t: LocalizableContent): string {

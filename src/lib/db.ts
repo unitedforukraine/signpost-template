@@ -19,33 +19,36 @@ export class DB extends Dexie {
 
   async loadLocalServices(): Promise<number> {
     const dbs = (await this.services.toArray()) || []
-
     if (dbs.length > 0) {
       const r = dbs.reduce((a, b) => { a[b.id] = b; return a }, {})
-      app.services = r as any
-      console.log("Local Services: ", r)
+      app.data.services = r as any
     }
+    console.log("Local Services Found: ", dbs.length)
     return dbs.length
-
   }
 
   async loadLocalProviders(): Promise<number> {
     const dbs = (await this.providers.toArray()) || []
-
     if (dbs.length > 0) {
       const r = dbs.reduce((a, b) => { a[b.id] = b; return a }, {})
-      app.categories.providers = r as any
-      console.log("Local Providers: ", r)
+      app.data.categories.providers = r as any
     }
+    console.log("Local Providers Found: ", dbs.length)
     return dbs.length
-
   }
 
   async updateServices() {
     console.log("Updating Database...")
 
-    const services = await api.getServices(app.country)
-    // const services = await api.getServices(2)
+    const dbs = (await this.services.toArray()) || []
+
+    let lastUpdate = 0
+    for (const s of dbs) {
+      if (s.date_updated > lastUpdate) lastUpdate = s.date_updated
+      if (s.date_created > lastUpdate) lastUpdate = s.date_created
+    }
+    console.log("Last Update: ", lastUpdate)
+    const services = await api.getServices(app.country, lastUpdate)
 
     if (services) {
       console.log(`Saving ${services.length} Services`)
@@ -53,93 +56,20 @@ export class DB extends Dexie {
         await this.services.put(service, service.id)
       }
     }
-
     console.log("Database Updated!")
   }
 
   async updateProviders() {
     console.log("Updating Providers Database...")
-
     const providers = await api.getProviders(app.country)
-    // const services = await api.getServices(2)
-
     if (providers) {
       console.log(`Saving ${providers.length} Providers`)
       for (const provider of providers) {
         await this.providers.put(provider, provider.id)
       }
     }
-
     console.log("Providers Database Updated!")
   }
 
 }
 
-declare global {
-
-  interface Service {
-    id?: number
-    status?: string
-    date_created?: number
-    date_updated?: number
-
-    name?: LocalizableText
-    description?: LocalizableText
-
-    hasLocation?: boolean
-    provider?: number
-    region?: string
-    city?: string
-    files?: string
-
-    contactName?: string
-    contactLastName?: string
-    contactTitle?: string
-    contactEmail?: string
-    contactPhone?: string
-    secondaryName?: string
-    secondaryLastName?: string
-    secondaryTitle?: string
-    secondaryEmail?: string
-    secondaryPhone?: string
-    address?: string
-    contactInfo?: unknown
-    form?: unknown
-    headerimage?: string
-    addHours?: unknown
-    location?: [lat: number, lon: number]
-    alwaysopen?: boolean
-
-    subcategories?: number[]
-    Accessibility?: number[]
-    Populations?: number[]
-    categories?: number[]
-  }
-
-  interface Provider {
-    id?: number
-    name?: LocalizableText
-    description?: LocalizableText
-    category?: number
-    address?: string
-    expiration?: number
-  }
-
-  interface Category {
-    id?: number
-    name?: LocalizableText
-    description?: LocalizableText
-    icon?: string
-    color?: string
-    parent?: number[]
-  }
-
-  interface Categories {
-    providers: { [index: number]: Category }
-    categories: { [index: number]: Category }
-    subCategories: { [index: number]: Category }
-    populations: { [index: number]: Category }
-    accesibility: { [index: number]: Category }
-  }
-
-}

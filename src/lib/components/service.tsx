@@ -7,7 +7,7 @@ export function Service() {
   let { id } = useParams()
 
   //ToDo: update the content in useEffect
-  const s: Service = app.services[id]
+  const s: Service = app.data.services[id]
 
   if (!s) {
     return <div>Service {id} not found</div>

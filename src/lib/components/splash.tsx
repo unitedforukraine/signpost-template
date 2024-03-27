@@ -3,7 +3,7 @@ import { Loader } from "./loader"
 
 export function Splash() {
 
-  if (app.status != "initializing") return null
+  if (app.state.status != "initializing") return null
 
   return <div className="w-full h-full flex flex-col justify-center items-center">
     <div className="-mt-40">

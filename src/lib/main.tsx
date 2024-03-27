@@ -5,10 +5,7 @@ import { app } from "./app"
 export function App() {
 
   app.reactUpdate = useForceUpdate()
-
-  app.initialize().then(() => {
-    // console.log("Initialized")
-  })
+  app.initialize().then(() => { })
 
   return <React.StrictMode>
     <div className="grid h-full grid-rows-1 grid-cols-1">

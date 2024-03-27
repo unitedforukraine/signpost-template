@@ -6,13 +6,13 @@ import { Service } from "./service"
 
 export function Page() {
 
-  if (app.status != "ready") return null
+  if (app.state.status != "ready") return null
   const styles: CSSProperties = {
     gridTemplateRows: "auto 1fr",
   }
 
-  if (app.color) styles.color = app.color
-  if (app.bgcolor) styles.backgroundColor = app.bgcolor
+  if (app.page.color) styles.color = app.page.color
+  if (app.page.bgcolor) styles.backgroundColor = app.page.bgcolor
 
   return <div className="grid" style={styles}>
     <BrowserRouter>

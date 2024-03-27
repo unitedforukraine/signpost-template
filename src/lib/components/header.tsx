@@ -7,8 +7,8 @@ export function Header() {
 
   const styles: CSSProperties = {}
 
-  if (app.header.color) styles.color = app.header.color
-  if (app.header.bgcolor) styles.backgroundColor = app.header.bgcolor
+  if (app.page.header.color) styles.color = app.page.header.color
+  if (app.page.header.bgcolor) styles.backgroundColor = app.page.header.bgcolor
 
   return <div className="h-10 flex p-4 uppercase text-sm tracking-wide" style={styles}>
     <div className="">
