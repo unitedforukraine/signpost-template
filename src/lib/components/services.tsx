@@ -11,7 +11,7 @@ html2text.hidden = true
 
 export function ServicesList() {
 
-  const services = Object.values(app.services) || []
+  const services = Object.values(app.data.services) || []
   const [page, setPage] = useState(1)
   const visibleServices = services.slice((page - 1) * count, (page * count))
 

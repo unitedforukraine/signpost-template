@@ -1,116 +1,14 @@
 // const serverurl = "http://localhost:3000"
 const serverurl = "https://directus-qa-support.azurewebsites.net"
 
-interface Doc {
-  pageContent?: string
-  metadata: {
-    source?: string
-    title?: string
-    id?: number
-    loc?: {
-      lines?: {
-        from?: number
-        to?: number
-      }
-    }
-  }
-}
-
-declare global {
-
-  interface ChatMessage {
-    type?: "human" | "bot"
-    id?: number
-    message?: string
-    botName?: string
-    isAnswer?: boolean
-    messages?: ChatMessage[]
-    docs?: Doc[]
-    error?: string
-    command?: "rebuild" | null
-    needsRebuild?: boolean
-    rebuild?(): void
-    question?: string
-  }
-
-  type AI_SCORES = "pass" | "fail" | "redflag"
-  interface BotHistory {
-    isHuman: boolean
-    message: string
-  }
-
-}
-
-
 
 export const api = {
 
-  async getCountry(id: number) {
-
-    let c: Country = null
-
-    try {
-      c = await fetch(`${serverurl}/country/${id}`).then(r => r.json())
-    } catch (error) {
-      console.log("Error Loading Country", error)
-    }
-
-    return c
-  },
-
-  async getServices(id: number, since?: number, page?: number): Promise<Service[]> {
-
-    let c: Service[] = null
-
-    //ToDo: add page and since!
-
-    try {
-      c = await fetch(`${serverurl}/services/${id}`).then(r => r.json())
-    } catch (error) {
-      console.log("Error Loading Services", error)
-    }
-
-    return c
-  },
-
-  async getProviders(id: number): Promise<Provider[]> {
-    let c: Provider[] = null
-
-    try {
-      c = await fetch(`${serverurl}/providers/${id}`).then(r => r.json())
-    } catch (error) {
-      console.log("Error Loading Providers", error)
-    }
-
-    return c
-  },
-
-  async getCategories() {
-
-    let cats: Categories = null
-
-    try {
-      cats = await fetch(`${serverurl}/categories`).then(r => r.json())
-    } catch (error) {
-      console.log("Error Loading Categories", error)
-    }
-
-    return cats
-  },
-
-  async getBots(): Promise<{ [index: number]: string }> {
-
-    let bots = {}
-
-    try {
-      bots = await fetch(`${serverurl}/bots`).then(r => r.json())
-    } catch (error) {
-      console.log("Error Loading Bots", error)
-    }
-
-    return bots
-
-  },
+  getCountry: (id: number) => getFromServer<Country>(`${serverurl}/country/${id}`),
+  getServices: (id: number, since = 0) => getFromServer<Service[]>(`${serverurl}/services/${id}/${since}`),
+  getProviders: (id: number) => getFromServer<Provider[]>(`${serverurl}/providers/${id}`),
+  getCategories: () => getFromServer<Categories>(`${serverurl}/categories`),
+  getBots: () => getFromServer<{ [index: number]: string }>(`${serverurl}/bots`),
 
   async askbot(req: ChatMessage, bots: { label: string, value: number, history: BotHistory[] }[]) {
 
@@ -184,6 +82,24 @@ export const api = {
 
   },
 
-
 }
+
+async function getFromServer<T>(url: string): Promise<Awaited<T>> {
+  let ret: any = null
+
+  console.log("Loading from Server: ", url)
+
+  try {
+    ret = await fetch(url).then(r => r.json())
+  } catch (error) {
+    console.log(`Error Loading ${url}`, error)
+  }
+
+  console.log("Loaded from Server: ", ret)
+
+
+  return ret
+}
+
+
 

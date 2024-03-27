@@ -5,46 +5,46 @@ import {
   Marker,
   NavigationControl,
   Popup,
-} from "react-map-gl";
-import { app, translate } from "../app";
-import mapboxgl from "mapbox-gl";
-import supercluster, { ClusterFeature, PointFeature } from "supercluster";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import GeocoderControl from "./geocoder-control";
-import { ContactDropdown } from "./contact-dropdown";
-import React from "react";
-import { useMultiState } from "./hooks";
+} from "react-map-gl"
+import { app, translate } from "../app"
+import mapboxgl from "mapbox-gl"
+import supercluster, { ClusterFeature, PointFeature } from "supercluster"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import GeocoderControl from "./geocoder-control"
+import { ContactDropdown } from "./contact-dropdown"
+import React from "react"
+import { useMultiState } from "./hooks"
 
 const getBoundsForFeatures = (services: Service[]) => {
-  const bounds = new mapboxgl.LngLatBounds();
+  const bounds = new mapboxgl.LngLatBounds()
 
   services.forEach((service) => {
     if (service.location?.length > 1) {
-      bounds.extend([+service.location[1], +service.location[0]]);
+      bounds.extend([+service.location[1], +service.location[0]])
     }
-  });
-  return bounds;
-};
+  })
+  return bounds
+}
 
 const stripHtmlTags = (html: string): string => {
   const regex =
-    /<[^>]*>|&[^;]+;|<img\s+.*?>|<span\s+style="[^"]*">.*?<\/span>|&[A-Za-z]+;/g;
-  return html.replace(regex, "");
-};
+    /<[^>]*>|&[^;]+;|<img\s+.*?>|<span\s+style="[^"]*">.*?<\/span>|&[A-Za-z]+;/g
+  return html.replace(regex, "")
+}
 
 interface mapProps {
-  services: Service[];
+  services: Service[]
 }
 
 export function Maps({ services }: mapProps) {
-  const categories = Object.values(app.categories.categories) || [];
+  const categories = Object.values(app.data.categories.categories) || []
   type ClusterOrPoint =
     | ClusterFeature<supercluster.AnyProps>
-    | PointFeature<supercluster.AnyProps>;
-  const [popupInfo, setPopupInfo] = useState<Service | null>(null);
-  const [clusters, setClusters] = useState<ClusterOrPoint[]>([]);
-  const [isMapReady, setIsMapReady] = useState(false);
-  const mapRef = useRef<MapRef>(null);
+    | PointFeature<supercluster.AnyProps>
+  const [popupInfo, setPopupInfo] = useState<Service | null>(null)
+  const [clusters, setClusters] = useState<ClusterOrPoint[]>([])
+  const [isMapReady, setIsMapReady] = useState(false)
+  const mapRef = useRef<MapRef>(null)
 
   const STYLE: mapboxgl.Style = {
     version: 8,
@@ -68,21 +68,21 @@ export function Maps({ services }: mapProps) {
         maxzoom: 19,
       },
     ],
-  };
+  }
 
   const bounds = useMemo(() => {
-    return getBoundsForFeatures(services);
-  }, [services]);
+    return getBoundsForFeatures(services)
+  }, [services])
 
   const customMarkerIcon = (category?: number) => {
-    const categorySelected = categories.filter((x) => x.id === category);
+    const categorySelected = categories.filter((x) => x.id === category)
     if (!categorySelected.length) {
       return (
         <i
           className={`rounded-full shadow border-4 border-black h-40 w-40 bg-white p-8 text-center text-2xl flex items-center`}
           style={{ color: "#FFFFFF" }}
         />
-      );
+      )
     } else {
       return (
         <span
@@ -91,15 +91,15 @@ export function Maps({ services }: mapProps) {
         >
           {categorySelected[0]?.icon}
         </span>
-      );
+      )
     }
-  };
+  }
 
   const cluster = useMemo(() => {
     const newCluster = new supercluster({
       radius: 40,
       maxZoom: 16,
-    });
+    })
     newCluster.load(
       services
         ?.filter((x) => x?.location?.length > 1)
@@ -115,25 +115,25 @@ export function Maps({ services }: mapProps) {
             coordinates: [+service.location[1], +service.location[0]],
           },
         }))
-    );
-    return newCluster;
-  }, [services]);
+    )
+    return newCluster
+  }, [services])
 
   const updateClusters = useCallback(() => {
-    const map = mapRef.current?.getMap();
-    if (!map) return;
+    const map = mapRef.current?.getMap()
+    if (!map) return
 
-    const bounds = map.getBounds();
+    const bounds = map.getBounds()
     const bbox: [number, number, number, number] = [
       bounds.getWest(),
       bounds.getSouth(),
       bounds.getEast(),
       bounds.getNorth(),
-    ];
+    ]
 
-    const newClusters = cluster.getClusters(bbox, Math.floor(map.getZoom()));
-    setClusters(newClusters);
-  }, [cluster, mapRef]);
+    const newClusters = cluster.getClusters(bbox, Math.floor(map.getZoom()))
+    setClusters(newClusters)
+  }, [cluster, mapRef])
 
   const loadAndUpdateClusters = useCallback(() => {
     const features = services
@@ -149,59 +149,58 @@ export function Maps({ services }: mapProps) {
           type: "Point" as const,
           coordinates: [+service.location[1], +service.location[0]],
         },
-      }));
+      }))
 
-    cluster.load(features);
-    updateClusters();
-  }, [services, cluster, updateClusters]);
+    cluster.load(features)
+    updateClusters()
+  }, [services, cluster, updateClusters])
 
   useEffect(() => {
     if (!isMapReady) {
-      return;
+      return
     }
 
-    const map = mapRef.current?.getMap();
+    const map = mapRef.current?.getMap()
 
     const onMapLoad = () => {
-      loadAndUpdateClusters();
-      mapRef.current?.getMap().on("move", updateClusters);
-    };
+      loadAndUpdateClusters()
+      mapRef.current?.getMap().on("move", updateClusters)
+    }
 
     if (map) {
       if (map.isStyleLoaded()) {
-        onMapLoad();
+        onMapLoad()
       } else {
-        map.on("load", onMapLoad);
+        map.on("load", onMapLoad)
       }
     }
 
     return () => {
       if (map) {
-        map.off("load", onMapLoad);
-        map.off("move", updateClusters);
+        map.off("load", onMapLoad)
+        map.off("move", updateClusters)
       }
-    };
-  }, [isMapReady]);
+    }
+  }, [isMapReady])
 
   useEffect(() => {
-    const map = mapRef.current?.getMap();
+    const map = mapRef.current?.getMap()
 
     if (map && bounds) {
       map.once("load", () => {
         map.fitBounds(bounds, {
           padding: 20,
-        });
-      });
+        })
+      })
     }
-  }, [bounds]);
+  }, [bounds])
 
   useEffect(() => {
-    console.log("123 ", services);
-  }, [services]);
+  }, [services])
 
   const handleViewportChange = () => {
-    updateClusters();
-  };
+    updateClusters()
+  }
 
   return (
     <div>
@@ -214,7 +213,7 @@ export function Maps({ services }: mapProps) {
           onMove={handleViewportChange}
           ref={mapRef}
           onLoad={() => {
-            setIsMapReady(true);
+            setIsMapReady(true)
           }}
         >
           <GeocoderControl
@@ -224,11 +223,11 @@ export function Maps({ services }: mapProps) {
           <GeolocateControl position="top-left" />
           <NavigationControl position="top-left" />
           {clusters.map((cluster: ClusterOrPoint) => {
-            const [longitude, latitude] = cluster.geometry.coordinates;
+            const [longitude, latitude] = cluster.geometry.coordinates
             const {
               cluster: isCluster,
               point_count_abbreviated: pointCountAbbreviated,
-            } = cluster.properties;
+            } = cluster.properties
 
             if (isCluster) {
               return (
@@ -237,12 +236,12 @@ export function Maps({ services }: mapProps) {
                   longitude={longitude}
                   latitude={latitude}
                   onClick={() => {
-                    const map = mapRef.current?.getMap();
-                    const zoom = map?.getZoom();
+                    const map = mapRef.current?.getMap()
+                    const zoom = map?.getZoom()
                     map?.flyTo({
                       center: [longitude, latitude],
                       zoom: (zoom || 0) + 3,
-                    });
+                    })
                   }}
                 >
                   <div
@@ -255,25 +254,25 @@ export function Maps({ services }: mapProps) {
                     {pointCountAbbreviated}
                   </div>
                 </Marker>
-              );
+              )
             } else {
               const service = services.find(
                 (s) => s.id === cluster.properties.serviceId
-              );
-              if (!service) return null;
+              )
+              if (!service) return null
               return (
                 <Marker
                   key={`marker-${cluster.properties.serviceId}`}
                   longitude={longitude}
                   latitude={latitude}
                   onClick={(e) => {
-                    e.originalEvent.stopPropagation();
-                    setPopupInfo(service);
+                    e.originalEvent.stopPropagation()
+                    setPopupInfo(service)
                   }}
                 >
                   {customMarkerIcon(cluster.properties.category)}
                 </Marker>
-              );
+              )
             }
           })}
           {popupInfo && (
@@ -320,5 +319,5 @@ export function Maps({ services }: mapProps) {
         </Map>
       </div>
     </div>
-  );
+  )
 }

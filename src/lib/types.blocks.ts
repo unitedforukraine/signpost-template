@@ -1,8 +1,13 @@
+export { }
+
+interface Footerlinks {
+  url?: string
+  title?: LocalizableText
+}
 
 declare global {
 
   type BlockTypes = "text" | "channels" | "info" | "services" | "image" | "richtext" | "footer"
-
   type Blocks = Block | BlockText | BlockChannels | BlockRichText | BlockInfo | BlockServices | BlockImage | BlockFooter
 
   interface Block {
@@ -81,38 +86,3 @@ declare global {
   }
 
 }
-
-interface Footerlinks {
-  url?: string
-  title?: LocalizableText
-}
-
-//default blocks
-export const blocks: Block[] = [
-  {
-    type: "text",
-    text: { "en-US": "Welcome Text" }
-  } satisfies BlockText,
-  {
-    type: "text",
-    text: { "en-US": "Secondary Text" }
-  } satisfies BlockText,
-  {
-    type: "channels",
-  } satisfies BlockChannels,
-  {
-    type: "services",
-  } satisfies BlockServices,
-  {
-    type: "richtext",
-  } satisfies BlockRichText,
-] as Block[]
-
-
-export { }
-
-const isBlockText = (b: Block): b is BlockText => b.type == "text"
-const isBlockRichText = (b: Block): b is BlockText => b.type == "richtext"
-const isBlockServices = (b: Block): b is BlockText => b.type == "services"
-const isBlockChannels = (b: Block): b is BlockText => b.type == "channels"
-

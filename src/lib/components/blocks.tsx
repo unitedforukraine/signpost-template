@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 
 export function Blocks() {
 
-  const blocks = app.content || []
+  const blocks = app.page.content || []
 
   const blockview = blocks.map((b, i) => {
     if (b.type === "text") return <BlockText key={b.sort} block={b as BlockText} />
