@@ -53,7 +53,8 @@ export const api = {
     return answer
   },
 
-  async qualifyBot(id: number, score: AI_SCORES, reporter: string, result: string, question: string, answer: string, failtype: string[], qualitymetrics: string[]) {
+  async qualifyBot(id: number, score: AI_SCORES, reporter: string, result: string, question: string, answer: string, failtype: string[], qualitymetrics: string[], prompttype: string, moderatorresponse: string
+  ) {
 
     const r = {
       id,
@@ -64,6 +65,8 @@ export const api = {
       answer,
       failtype,
       qualitymetrics,
+      prompttype,
+      moderatorresponse,
     }
 
     let options = {

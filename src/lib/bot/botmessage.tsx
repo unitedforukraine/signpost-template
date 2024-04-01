@@ -63,6 +63,7 @@ export function BotChatMessage(props: { m: ChatMessage, isWaiting: boolean, rebu
       <FaThumbsDown className="mt-1 cursor-pointer" onClick={showModalNegative} />
       <FaFlag className="mt-1 cursor-pointer text-red-500" onClick={showModalRedFlag} />
     </div>}
+
     {linklist.length > 0 && <div className="text-xs mt-4 uppercase">
       <div className="font-medium no-underline">
         <div className="mb-2">References:</div>
@@ -80,6 +81,8 @@ type Inputs = {
   sfr: string[]
   qmf: string[]
   expectedResult: string
+  prompttype: string
+  moderatorresponse: string
 }
 
 
@@ -142,15 +145,42 @@ const qmf: SelectProps['options'] = [
   }
 ]
 
+const prompttype: SelectProps['options'] = [
+  {
+    value: "user",
+    label: "User Prompt",
+  },
+  {
+    value: "synthetic",
+    label: "Synthetic Prompt",
+  },
+]
+
 function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void, score?: AI_SCORES }) {
 
   const { m, open, close, score } = props
   const { botName, id } = m
   const [confirmLoading, setConfirmLoading] = useState(false)
-  const { register, handleSubmit, clearErrors, formState: { errors }, trigger, control, resetField } = useForm<Inputs>()
+  const { register, handleSubmit, clearErrors, formState: { errors }, trigger, control, resetField, getValues, watch } = useForm<Inputs>()
+
+  const [showModeratorResponse, setShowModeratorResponse] = useState(false)
+
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      if (name == "prompttype") {
+        if (value.prompttype == "user") {
+          setShowModeratorResponse(true)
+        } else {
+          setShowModeratorResponse(false)
+        }
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [watch])
+
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    await api.qualifyBot(id, score, data.reporter, data.expectedResult, m.question, m.message, data.sfr || [], data.qmf || [])
+    await api.qualifyBot(id, score, data.reporter, data.expectedResult, m.question, m.message, data.sfr || [], data.qmf || [], data.prompttype, data.moderatorresponse)
   }
 
   const handleOk = async () => {
@@ -171,11 +201,15 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
     clearErrors()
     resetField("expectedResult")
     resetField("sfr")
+    resetField("moderatorresponse")
   }
 
   const title = score == "fail" ? "Qualify Negative" : score == "pass" ? "Qualify Positive" : "Red Flag"   //{`${botName} - ${positive ? 'Qualify Positive' : 'Qualify Negative'}`}
   const isFail = score == "fail" || score == "redflag"
   const required = score == "fail"
+
+
+
 
   return <Modal
     title={`${botName} - ${title}`}
@@ -235,6 +269,33 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
         {required && errors.qmf && <span className='text-red-500'>This field is required</span>}
       </div>}
 
+      <div >
+        <div className='font-medium mb-1'>Prompt Type</div>
+        <Controller
+          name="prompttype"
+          control={control}
+          render={({ field }) => <Select
+            className="w-full"
+            placeholder="Please select"
+            options={prompttype}
+            {...field}
+          />
+          }
+        />
+        {/* {required && errors.qmf && <span className='text-red-500'>This field is required</span>} */}
+      </div>
+
+
+      {showModeratorResponse && <div>
+        <div className='font-medium mb-1'>Moderator Response</div>
+        <Controller
+          name="moderatorresponse"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => <TextArea {...field} />}
+        />
+        {errors.moderatorresponse && <span className='text-red-500'>This field is required</span>}
+      </div>}
 
       <div>
         <div className='font-medium mb-1'>Comments</div>
