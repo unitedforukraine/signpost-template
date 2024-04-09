@@ -4,11 +4,13 @@ const serverurl = "https://directus-qa-support.azurewebsites.net"
 
 export const api = {
 
-  getCountry: (id: number) => getFromServer<Country>(`${serverurl}/country/${id}`),
-  getServices: (id: number, since = 0) => getFromServer<Service[]>(`${serverurl}/services/${id}/${since}`),
-  getProviders: (id: number) => getFromServer<Provider[]>(`${serverurl}/providers/${id}`),
+  getCountry: (country: number) => getFromServer<Country>(`${serverurl}/country/${country}`),
+  getServices: (country: number, since = 0) => getFromServer<Service[]>(`${serverurl}/services/${country}/${since}`),
+  getProviders: (country: number) => getFromServer<Provider[]>(`${serverurl}/providers/${country}`),
   getCategories: () => getFromServer<Categories>(`${serverurl}/categories`),
   getBots: () => getFromServer<{ [index: number]: string }>(`${serverurl}/bots`),
+  getArticles: (country: number) => getFromServer<{ [index: string]: ZendeskCategory }>(`${serverurl}/articles/${country}`),
+  getAttachments: (country: number, article: number) => getFromServer<ZendeskArticleAttachment[]>(`${serverurl}/attachments/${country}/${article}`),
 
   async askbot(req: ChatMessage, bots: { label: string, value: number, history: BotHistory[] }[]) {
 
@@ -53,8 +55,7 @@ export const api = {
     return answer
   },
 
-  async qualifyBot(id: number, score: AI_SCORES, reporter: string, result: string, question: string, answer: string, failtype: string[], qualitymetrics: string[], prompttype: string, moderatorresponse: string
-  ) {
+  async qualifyBot(id: number, score: AI_SCORES, reporter: string, result: string, question: string, answer: string, failtype: string[], qualitymetrics: string[], prompttype: string, moderatorresponse: string) {
 
     const r = {
       id,

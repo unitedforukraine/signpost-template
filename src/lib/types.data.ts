@@ -54,6 +54,41 @@ declare global {
     categories?: number[]
   }
 
+  interface ZendeskArticle {
+    id?: number
+    name?: LocalizableText
+    description?: LocalizableText
+    section?: number
+    category?: number
+  }
+
+  interface ZendeskSection {
+    id?: number
+    name?: LocalizableText
+    description?: LocalizableText
+    icon?: string
+    category?: number
+    articles?: {
+      [index: number]: ZendeskArticle
+    }
+  }
+
+  interface ZendeskCategory {
+    id?: number
+    name?: LocalizableText
+    description?: LocalizableText
+    icon?: string
+    sections?: {
+      [index: number]: ZendeskSection
+    }
+  }
+
+  export interface ZendeskArticleAttachment {
+    fileName: string
+    url: string
+  }
+
+
   interface Provider {
     id?: number
     name?: LocalizableText

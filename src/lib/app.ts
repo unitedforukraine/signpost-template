@@ -82,6 +82,12 @@ export const app = {
 
     services: {} as Services,
 
+    zendesk: {
+      categories: {} as { [index: number]: ZendeskCategory },
+      sections: {} as { [index: number]: ZendeskSection },
+      articles: {} as { [index: number]: ZendeskArticle },
+    }
+
   },
 
 
@@ -136,21 +142,17 @@ export const app = {
         app.state.status = "ready"
 
         const sc = await app.db.loadLocalServices()
-        const pc = await app.db.loadLocalProviders()
+        await app.db.loadLocalProviders()
+        await app.db.loadLocalProviders()
 
-        if (sc > 0) {
-          app.state.servicesLoaded = true
-          app.update()
-        }
-
-        if (pc > 0) {
-          app.update()
-        }
+        app.state.servicesLoaded = sc > 0
+        app.update()
 
         await app.db.updateProviders()
         await app.db.updateServices()
-        app.state.servicesLoaded = true
+        await app.db.updateArticles()
 
+        app.state.servicesLoaded = true
         app.update()
 
         console.log("Updating Categories...")
