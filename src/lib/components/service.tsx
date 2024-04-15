@@ -156,8 +156,8 @@ export function Service({ lastEdit }: ServiceContentProps) {
   console.log("Provider:", provider);
 
   return (
-    <div className="py-30 mb-20 w-full flex flex-col items-center text-black bg-white">
-      <div className="container max-w-4xl">
+    <div className="py-30 mb-20 w-full flex flex-col items-center text-black bg-white overflow-auto">
+      <div className="container max-w-4xl px-4">
         <h1 className="text-3xl font-bold">{title}</h1>
         <LastEditStamp {...lastEdit} />
         <h2 className="text-xl provider-name">{location}</h2>
