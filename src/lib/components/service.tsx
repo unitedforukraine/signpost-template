@@ -96,6 +96,7 @@ export function Service({ lastEdit }: ServiceContentProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("Last Edit data:", lastEdit); 
     const fetchData = async () => {
       const s = app.data.services[id];
       console.log("Fetched service:", s);

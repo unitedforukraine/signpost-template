@@ -19,7 +19,7 @@ export function Page() {
       <Header />
       <Routes>
         <Route path="/" element={<Blocks />} />
-        <Route path="/service/:id?" element={<Service />} />
+        <Route path="/service/:id?" element={<Service lastEdit={undefined} publicContactInformationStrings={{}} />} />
         <Route path="/signpostbot" element={<AIBot />} />
       </Routes>
     </BrowserRouter>
