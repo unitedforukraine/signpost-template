@@ -16,10 +16,6 @@ import { useParams } from "react-router-dom";
 import { app, translate } from "../app";
 import React, { useEffect, useState } from "react";
 
-export interface ServiceContentProps {
-  publicContactInformationStrings: { [channel: string]: string };
-}
-
 function formatDate(timestamp) {
   return moment(timestamp).format("MM/DD/YYYY, h:mm a");
 }
@@ -88,7 +84,7 @@ function getContactDetailLink(info: {
   }
 }
 
-export function Service({}: ServiceContentProps) {
+export function Service() {
   let { id } = useParams();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
