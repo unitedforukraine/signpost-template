@@ -81,7 +81,7 @@ declare global {
     instagram_link?: string
     whatsappc?: LocalizableText
     whatsappc_link?: string
-    toktok?: LocalizableText
+    tiktok?: LocalizableText
     tiktok_link?: string
   }
 
