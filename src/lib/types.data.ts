@@ -60,6 +60,7 @@ declare global {
     description?: LocalizableText
     section?: number
     category?: number
+    updated_at?: string
   }
 
   interface ZendeskSection {
@@ -115,5 +116,14 @@ declare global {
     accesibility: { [index: number]: Category }
   }
 
+  interface Attachment {
+    fileName: string;
+    url: string;
+  }
 
+  interface ZendeskData {
+    categories: { [index:number]: ZendeskCategory }
+    sections: { [index:number]: ZendeskSection }
+    articles: { [index:number]: ZendeskArticle }
+  }
 }

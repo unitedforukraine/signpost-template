@@ -213,5 +213,3 @@ export function translate(t: LocalizableContent): string {
 export async function sleep(ms = 1000) {
   return new Promise(a => setTimeout(a, ms))
 }
-
-
