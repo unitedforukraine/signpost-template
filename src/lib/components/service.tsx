@@ -1,4 +1,4 @@
-import LastEditStamp, { LastEditStampProps } from "./last-edit-stamp";
+import moment from "moment";
 import {
   FaTiktok,
   FaFacebook,
@@ -17,8 +17,11 @@ import { app, translate } from "../app";
 import React, { useEffect, useState } from "react";
 
 export interface ServiceContentProps {
-  lastEdit: LastEditStampProps;
   publicContactInformationStrings: { [channel: string]: string };
+}
+
+function formatDate(timestamp) {
+  return moment(timestamp).format("MM/DD/YYYY, h:mm a");
 }
 
 function GetIconForChannel({ channel }: { channel: string }) {
@@ -85,18 +88,12 @@ function getContactDetailLink(info: {
   }
 }
 
-const formatTime = (time) => {
-  const [hours, minutes] = time.split(":");
-  return `${hours}:${minutes}`;
-};
-
-export function Service({ lastEdit }: ServiceContentProps) {
+export function Service({}: ServiceContentProps) {
   let { id } = useParams();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("Last Edit data:", lastEdit); 
     const fetchData = async () => {
       const s = app.data.services[id];
       console.log("Fetched service:", s);
@@ -114,58 +111,71 @@ export function Service({ lastEdit }: ServiceContentProps) {
   if (!service) {
     return <div>Service {id} not found</div>;
   }
-  console.log("Rendering service component", { service });
-  console.log("contact info", service.contactInfo);
+ 
+  const providerName = app.data.categories.providers[service.provider]?.name;
 
-  const contactInfoDisplay = service.contactInfo?.map((info, index) => {
-    console.log("Processing:", info); // More detailed debugging for each item
-    if (!info.contact_details) {
-      console.log("No contact details for:", info); // Check for missing contact details
-      return null;
-    }
-
-    const Icon = <GetIconForChannel channel={info.channel} />;
-    const ContactDetail = getContactDetailLink({
-      channel: info.channel,
-      contactDetails: info.contact_details,
-    });
-
+  function ContactDetails({ contactInfo }) {
     return (
-      <div key={index} className="mb-2 last:mb-0">
-        <h3 className="text-lg font-bold flex items-center mb-1">
-          {Icon}
-          <span className="ml-2">{info.channel}</span>
-        </h3>
-        <div>{ContactDetail}</div>
+      <div className="space-y-4">
+        {contactInfo.map((info, index) => {
+          if (!info.contact_details) return null;
+
+          const Icon = <GetIconForChannel channel={info.channel} />;
+          const ContactDetail = getContactDetailLink({
+            channel: info.channel,
+            contactDetails: info.contact_details,
+          });
+
+          return (
+            <div key={index} className="flex flex-row items-start p-2">
+              {/* Icon and Channel Name */}
+              <div className="flex items-center space-x-2 mr-4">
+                {Icon}
+                {/* <h1 className="text-sm font-bold">{info.channel}</h1> */}
+              </div>
+              {/* Contact Details */}
+              <div className="text-md text-gray-600">{ContactDetail}</div>
+            </div>
+          );
+        })}
       </div>
     );
-  });
+  }
+
+  const hourDisplay = service.addHours
+    ?.map((hour, index) => {
+      if (!hour.open.trim() || !hour.close.trim()) {
+        return null;
+      }
+
+      return (
+        <div key={index} className="hours-container">
+          <span className="day-label">{translate(hour.Day.trim())}: </span>
+          <span className="time">
+            {hour.open} - {hour.close}
+          </span>
+        </div>
+      );
+    })
+    .filter((hour) => hour !== null);
 
   const title = translate(service.name);
   const location = translate(service.address);
   const description = translate(service.description);
-  const hourDisplay = service.addHours?.map((hour, index) => (
-    <div key={index} className="hours-container">
-      <span className="day-label">{translate(hour.Day.trim())}: </span>
-      <span className="time">
-        {formatTime(hour.open)} - {formatTime(hour.close)}
-      </span>
-    </div>
-  ));
-  const provider = translate(service.provider.name);
-  console.log("Provider:", provider);
+
 
   return (
     <div className="py-30 mb-20 w-full flex flex-col items-center text-black bg-white overflow-auto">
       <div className="container max-w-4xl px-4">
         <h1 className="text-3xl font-bold">{title}</h1>
-        <LastEditStamp {...lastEdit} />
-        <h2 className="text-xl provider-name">{location}</h2>
+        <p>Last Updated: {formatDate(service.date_updated)}</p>
+        <h2 className="text-xl">{location}</h2>
+        <p>{translate("Provider")}: {translate(providerName)} </p>
+
         <div
           className="service mt-10"
           dangerouslySetInnerHTML={{ __html: description }}
         />
-
         {hourDisplay && hourDisplay.length > 0 && (
           <div className="bg-white shadow-lg rounded-lg p-6 mt-4 mb-4">
             <h2 className="text-xl font-bold mb-3">
@@ -175,10 +185,10 @@ export function Service({ lastEdit }: ServiceContentProps) {
           </div>
         )}
 
-        {contactInfoDisplay && contactInfoDisplay.length > 0 && (
+        {service.contactInfo && service.contactInfo.length > 0 && (
           <div className="bg-white shadow-lg rounded-lg p-6 mt-4 mb-4">
             <h2 className="text-xl font-bold mb-3">Contact Information</h2>
-            <div className="flex flex-wrap gap-4">{contactInfoDisplay}</div>
+            <ContactDetails contactInfo={service.contactInfo} />
           </div>
         )}
       </div>
