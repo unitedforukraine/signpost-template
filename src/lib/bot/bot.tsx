@@ -49,8 +49,9 @@ export function AIBot() {
   const onSend = async (message: string) => {
 
     // message ||= "what is kobo forms?"
-    // message ||= "how do I get a passport in Iraq?"
-    message ||= "What documents do I need to work in Greece?"
+    message ||= "how do I get a passport in Iraq?"
+    // message ||= "What documents do I need to work in Greece?"
+    // message ||= "what about Communication Channels and contact?"
 
     if (!message) return
 
@@ -195,7 +196,6 @@ function ChatMessage(props: MessageProps) {
   const hasBots = messages.length > 0
 
   if (type == "bot") {
-
 
     return <div className="mt-8">
       <div className="flex">

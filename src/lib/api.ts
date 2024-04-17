@@ -44,6 +44,7 @@ export const api = {
       }
 
       if (a.error) a.message = a.error
+
       a.type = "bot"
       a.id = b.value
       a.botName = b.label

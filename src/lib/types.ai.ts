@@ -23,6 +23,7 @@ declare global {
     message?: string
     botName?: string
     isAnswer?: boolean
+    isContacts?: boolean
     messages?: ChatMessage[]
     docs?: DocumentReference[]
     error?: string
