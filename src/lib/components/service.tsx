@@ -108,7 +108,6 @@ export function Service() {
     return <div>Service {id} not found</div>;
   }
  
-  const providerName = app.data.categories.providers[service.provider]?.name;
 
   function ContactDetails({ contactInfo }) {
     return (
@@ -158,6 +157,8 @@ export function Service() {
   const title = translate(service.name);
   const location = translate(service.address);
   const description = translate(service.description);
+  const providerName = translate(app.data.categories.providers[service.provider].name);
+  console.log('Provider:',providerName)
 
 
   return (
@@ -166,7 +167,7 @@ export function Service() {
         <h1 className="text-3xl font-bold">{title}</h1>
         <p>Last Updated: {formatDate(service.date_updated)}</p>
         <h2 className="text-xl">{location}</h2>
-        <p>{translate("Provider")}: {translate(providerName)} </p>
+        <p>{providerName}</p>
 
         <div
           className="service mt-10"
