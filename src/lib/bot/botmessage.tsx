@@ -9,7 +9,7 @@ const { TextArea } = Input
 
 export function BotChatMessage(props: { m: ChatMessage, isWaiting: boolean, rebuild: () => void }) {
 
-  let { isWaiting, rebuild, m } = props
+  let { isWaiting, rebuild, m, } = props
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const [state, setState] = useMultiState({
@@ -48,7 +48,19 @@ export function BotChatMessage(props: { m: ChatMessage, isWaiting: boolean, rebu
 
   return <div>
     <div className="flex">
-      <div className="">{m.message}</div>
+
+      {!m.isContacts && <div className="">{m.message}</div>}
+
+      {m.isContacts && <div className="">
+        {m.message}
+        <div className="text-xs mt-2 mb-2 uppercase">
+          <div className="font-medium no-underline">
+            {linklist}
+          </div>
+        </div>
+      </div>}
+
+
       {!isWaiting && m.needsRebuild && <Button
         className="mx-2 -mt-1"
         type="primary"
@@ -64,7 +76,7 @@ export function BotChatMessage(props: { m: ChatMessage, isWaiting: boolean, rebu
       <FaFlag className="mt-1 cursor-pointer text-red-500" onClick={showModalRedFlag} />
     </div>}
 
-    {linklist.length > 0 && <div className="text-xs mt-4 uppercase">
+    {linklist.length > 0 && !m.isContacts && <div className="text-xs mt-4 uppercase">
       <div className="font-medium no-underline">
         <div className="mb-2">References:</div>
         {linklist}
@@ -80,6 +92,7 @@ type Inputs = {
   reporter: string
   sfr: string[]
   qmf: string[]
+  redorq: "rtmf" | "qmf"
   expectedResult: string
   prompttype: string
   moderatorresponse: string
@@ -156,6 +169,17 @@ const prompttype: SelectProps['options'] = [
   },
 ]
 
+const redorq: SelectProps['options'] = [
+  {
+    value: "rtmf",
+    label: "Red Team Metrics Flag",
+  },
+  {
+    value: "qmf",
+    label: "Quality Metric Flag",
+  },
+]
+
 function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void, score?: AI_SCORES }) {
 
   const { m, open, close, score } = props
@@ -164,6 +188,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
   const { register, handleSubmit, clearErrors, formState: { errors }, trigger, control, resetField, getValues, watch } = useForm<Inputs>()
 
   const [showModeratorResponse, setShowModeratorResponse] = useState(false)
+  const [metricType, setmMtricType] = useState("rtmf")
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
@@ -174,6 +199,13 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
           setShowModeratorResponse(false)
         }
       }
+
+      if (value.redorq == "rtmf") {
+        setmMtricType("rtmf")
+      } else {
+        setmMtricType("qmf")
+      }
+
     })
     return () => subscription.unsubscribe()
   }, [watch])
@@ -209,6 +241,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
   const required = score == "fail"
 
 
+  console.log(errors, required, metricType)
 
 
   return <Modal
@@ -234,11 +267,28 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
       </div>
 
       {isFail && <div>
+        <div className='font-medium mb-1'>Metric Flag Type</div>
+        <Controller
+          name="redorq"
+          control={control}
+          rules={{ required }}
+          render={({ field }) => <Select
+            className="w-full"
+            placeholder="Please select"
+            options={redorq}
+            {...field}
+          />
+          }
+        />
+        {required && errors.sfr && <span className='text-red-500'>This field is required</span>}
+      </div>}
+
+      {isFail && metricType == "rtmf" && <div>
         <div className='font-medium mb-1'>Red Team Metrics Flag</div>
         <Controller
           name="sfr"
           control={control}
-          rules={{ required }}
+          rules={{ required: metricType == "rtmf" }}
           render={({ field }) => <Select
             mode="multiple"
             className="w-full"
@@ -248,15 +298,15 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
           />
           }
         />
-        {required && errors.sfr && <span className='text-red-500'>This field is required</span>}
+        {errors.sfr && metricType == "rtmf" && <span className='text-red-500'>This field is required</span>}
       </div>}
 
-      {isFail && <div >
+      {isFail && metricType == "qmf" && <div >
         <div className='font-medium mb-1'>Quality Metric Flag</div>
         <Controller
           name="qmf"
           control={control}
-          rules={{ required }}
+          rules={{ required: metricType == "qmf" }}
           render={({ field }) => <Select
             mode="multiple"
             className="w-full"
@@ -266,7 +316,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
           />
           }
         />
-        {required && errors.qmf && <span className='text-red-500'>This field is required</span>}
+        {errors.qmf && metricType == "qmf" && <span className='text-red-500'>This field is required</span>}
       </div>}
 
       <div >
@@ -282,7 +332,6 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
           />
           }
         />
-        {/* {required && errors.qmf && <span className='text-red-500'>This field is required</span>} */}
       </div>
 
 
