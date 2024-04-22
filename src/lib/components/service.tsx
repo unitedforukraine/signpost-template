@@ -14,7 +14,7 @@ import {
 } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import { app, translate } from "../app";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 function formatDate(timestamp) {
   return moment(timestamp).format("MM/DD/YYYY, h:mm a");
@@ -86,28 +86,17 @@ function getContactDetailLink(info: {
 
 export function Service() {
   let { id } = useParams();
-  const [service, setService] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const s = app.data.services[id];
-      console.log("Fetched service:", s);
-      setService(s);
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [id]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  //ToDo: update the content in useEffect
+  const service: Service = app.data.services[id];
+  console.log(service, "Service Detail:");
+  const providerName = translate(
+    app.data.categories.providers[service?.provider]?.name
+  );
 
   if (!service) {
     return <div>Service {id} not found</div>;
   }
- 
 
   function ContactDetails({ contactInfo }) {
     return (
@@ -137,29 +126,34 @@ export function Service() {
     );
   }
 
-  const hourDisplay = service.addHours
-    ?.map((hour, index) => {
-      if (!hour.open.trim() || !hour.close.trim()) {
-        return null;
-      }
-
-      return (
-        <div key={index} className="hours-container">
-          <span className="day-label">{translate(hour.Day.trim())}: </span>
+  function renderHours(hours: unknown): JSX.Element[] | null {
+    if (!Array.isArray(hours)) {
+      return null;
+    }
+    const validHours = hours
+      .filter(
+        (hour: any) =>
+          typeof hour === "object" &&
+          hour.Day &&
+          hour.open.trim() &&
+          hour.close.trim()
+      )
+      .map((hour: any) => (
+        <div key={hour.Day} className="hours-container">
+          <span className="day-label">{hour.Day}: </span>
           <span className="time">
             {hour.open} - {hour.close}
           </span>
         </div>
-      );
-    })
-    .filter((hour) => hour !== null);
+      ));
+    return validHours.length > 0 ? validHours : null;
+  }
 
+  const hourDisplay = renderHours(service.addHours);
   const title = translate(service.name);
   const location = translate(service.address);
   const description = translate(service.description);
-  const providerName = translate(app.data.categories.providers[service.provider].name);
-  console.log('Provider:',providerName)
-
+  const providerInfo = translate(providerName);
 
   return (
     <div className="py-30 mb-20 w-full flex flex-col items-center text-black bg-white overflow-auto">
@@ -167,13 +161,13 @@ export function Service() {
         <h1 className="text-3xl font-bold">{title}</h1>
         <p>Last Updated: {formatDate(service.date_updated)}</p>
         <h2 className="text-xl">{location}</h2>
-        <p>{providerName}</p>
+        {providerName && <p>{providerInfo}</p>}
 
         <div
           className="service mt-10"
           dangerouslySetInnerHTML={{ __html: description }}
         />
-        {hourDisplay && hourDisplay.length > 0 && (
+        {hourDisplay && (
           <div className="bg-white shadow-lg rounded-lg p-6 mt-4 mb-4">
             <h2 className="text-xl font-bold mb-3">
               {translate("Service Hours")}
@@ -182,12 +176,13 @@ export function Service() {
           </div>
         )}
 
-        {service.contactInfo && service.contactInfo.length > 0 && (
-          <div className="bg-white shadow-lg rounded-lg p-6 mt-4 mb-4">
-            <h2 className="text-xl font-bold mb-3">Contact Information</h2>
-            <ContactDetails contactInfo={service.contactInfo} />
-          </div>
-        )}
+        {/* 
+        {service.contactInfo && service.contactInfo.length > 0 && ( */}
+        <div className="bg-white shadow-lg rounded-lg p-6 mt-4 mb-4">
+          <h2 className="text-xl font-bold mb-3">Contact Information</h2>
+          <ContactDetails contactInfo={service.contactInfo} />
+        </div>
+        {/* )} */}
       </div>
     </div>
   );
