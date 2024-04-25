@@ -241,9 +241,6 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
   const required = score == "fail"
 
 
-  console.log(errors, required, metricType)
-
-
   return <Modal
     title={`${botName} - ${title}`}
     open={open}
@@ -283,8 +280,8 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
         {required && errors.sfr && <span className='text-red-500'>This field is required</span>}
       </div>}
 
-      {isFail && metricType == "rtmf" && <div>
-        <div className='font-medium mb-1'>Red Team Metrics Flag</div>
+      {metricType == "rtmf" || !isFail && <div>
+        <div className='font-medium mb-1'>{isFail ? `Red Team Metrics Flag` : `Red Team Objective`}</div>
         <Controller
           name="sfr"
           control={control}
@@ -301,8 +298,8 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
         {errors.sfr && metricType == "rtmf" && <span className='text-red-500'>This field is required</span>}
       </div>}
 
-      {isFail && metricType == "qmf" && <div >
-        <div className='font-medium mb-1'>Quality Metric Flag</div>
+      {metricType == "qmf" || !isFail && <div >
+        <div className='font-medium mb-1'> {isFail ? "Quality Metric Flag" : "Quality Team Objective"}</div>
         <Controller
           name="qmf"
           control={control}
