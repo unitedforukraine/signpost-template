@@ -172,11 +172,11 @@ const prompttype: SelectProps['options'] = [
 const redorq: SelectProps['options'] = [
   {
     value: "rtmf",
-    label: "Red Team Metrics Flag",
+    label: "Red Team Metrics",
   },
   {
     value: "qmf",
-    label: "Quality Metric Flag",
+    label: "Quality Metric",
   },
 ]
 
@@ -263,7 +263,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
         {errors.reporter && <span className='text-red-500'>This field is required</span>}
       </div>
 
-      {isFail && <div>
+      {<div>
         <div className='font-medium mb-1'>Metric Flag Type</div>
         <Controller
           name="redorq"
@@ -280,7 +280,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
         {required && errors.sfr && <span className='text-red-500'>This field is required</span>}
       </div>}
 
-      {metricType == "rtmf" || !isFail && <div>
+      {metricType == "rtmf" && <div>
         <div className='font-medium mb-1'>{isFail ? `Red Team Metrics Flag` : `Red Team Objective`}</div>
         <Controller
           name="sfr"
@@ -298,7 +298,7 @@ function BotScoreModal(props: { m: ChatMessage, open: boolean, close: () => void
         {errors.sfr && metricType == "rtmf" && <span className='text-red-500'>This field is required</span>}
       </div>}
 
-      {metricType == "qmf" || !isFail && <div >
+      {metricType == "qmf" && <div >
         <div className='font-medium mb-1'> {isFail ? "Quality Metric Flag" : "Quality Team Objective"}</div>
         <Controller
           name="qmf"
