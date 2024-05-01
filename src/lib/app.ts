@@ -59,12 +59,14 @@ export const app = {
     header: {
       color: null as string,
       bgcolor: null as string,
+      menu: [] as Menu[],
     },
 
     footer: {
       text: { "en-US": "Footer" },
       footerlinks: []
     } as BlockFooter,
+
 
     content: [...defaultBlocks],
 
@@ -198,6 +200,7 @@ function loadCountry(c: Country) {
 
   app.page.header.color = c.headercolor || c.pagecolor
   app.page.header.bgcolor = c.headerbgcolor || c.pagebgcolor
+  app.page.header.menu = c.menu || []
 
   const footer = c.content.find(b => b.type === "footer")
   if (footer) app.page.footer = footer as BlockFooter

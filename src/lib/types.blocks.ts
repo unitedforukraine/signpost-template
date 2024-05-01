@@ -97,4 +97,13 @@ declare global {
     subtitle?: LocalizableText
   }
 
+  interface Menu {
+    type?: "services" | "info" | "info" | "about" | "language" | "menu"
+    title?: LocalizableText
+    link?: string
+    content?: Menu[],
+  }
+
+
+
 }
