@@ -13,6 +13,7 @@ declare global {
     pagebgcolor?: string
     headercolor?: string
     headerbgcolor?: string
+    menu: Menu[]
   }
 
   interface Service {
@@ -116,13 +117,13 @@ declare global {
   }
 
   interface Attachment {
-    fileName: string;
-    url: string;
+    fileName: string
+    url: string
   }
 
   interface ZendeskData {
-    categories: { [index:number]: ZendeskCategory }
-    sections: { [index:number]: ZendeskSection }
-    articles: { [index:number]: ZendeskArticle }
+    categories: { [index: number]: ZendeskCategory }
+    sections: { [index: number]: ZendeskSection }
+    articles: { [index: number]: ZendeskArticle }
   }
 }
