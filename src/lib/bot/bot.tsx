@@ -202,14 +202,38 @@ function ChatMessage(props: MessageProps) {
         <div className="">
           <BsRobot size={24} className="text-indigo-500" />
         </div>
-        {hasBots && <div className="-mt-3 ml-4 w-11/12">
-          <Tabs className="w-full" items={items} />
+        {hasBots && <div className="-mt-3 ml-4 w-full flex gap-4">
+
+          {messages.map((m) => {
+            return <div key={m.id} className="">
+              <div className="font-medium text-xs text-blue-500 mb-1">{m.botName}</div>
+              <BotChatMessage m={m} key={m.id} isWaiting={isWaiting} rebuild={rebuild} />
+            </div>
+          })}
+
+          {/* <Tabs className="w-full" items={items} /> */}
         </div>}
         {!hasBots && <div className="">
           <div className="ml-2">{message}</div>
         </div>}
       </div>
     </div>
+
+    // return <div className="mt-8">
+    //   <div className="flex">
+    //     <div className="">
+    //       <BsRobot size={24} className="text-indigo-500" />
+    //     </div>
+    //     {hasBots && <div className="-mt-3 ml-4 w-11/12">
+    //       <Tabs className="w-full" items={items} />
+    //     </div>}
+    //     {!hasBots && <div className="">
+    //       <div className="ml-2">{message}</div>
+    //     </div>}
+    //   </div>
+    // </div>
+
+
   }
 
   return <div className="mt-8">
