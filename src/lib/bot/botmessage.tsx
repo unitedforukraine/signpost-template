@@ -1,63 +1,59 @@
-import type { SelectProps, TabsProps } from "antd";
-import { Button, Input, Modal, Select } from "antd";
-import { useEffect, useState } from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { FaThumbsDown, FaThumbsUp, FaFlag } from "react-icons/fa";
-import { useMultiState } from "..";
-import { api } from "../api";
-const { TextArea } = Input;
+import type { SelectProps, TabsProps } from "antd"
+import { Button, Input, Modal, Select } from "antd"
+import { useEffect, useState } from "react"
+import { Controller, SubmitHandler, useForm } from "react-hook-form"
+import { FaThumbsDown, FaThumbsUp, FaFlag } from "react-icons/fa"
+import { useMultiState } from ".."
+import { api } from "../api"
+import Markdown from "react-markdown"
+const { TextArea } = Input
 
-export function BotChatMessage(props: {
-  m: ChatMessage;
-  isWaiting: boolean;
-  rebuild: () => void;
-}) {
-  let { isWaiting, rebuild, m } = props;
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export function BotChatMessage(props: { m: ChatMessage; isWaiting: boolean; rebuild: () => void }) {
+
+  let { isWaiting, rebuild, m } = props
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const [state, setState] = useMultiState({
     open: false,
     positivie: "fail" as AI_SCORES,
-  });
+  })
 
   const showModalPositive = () => {
-    setState({ open: true, positivie: "pass" });
-  };
+    setState({ open: true, positivie: "pass" })
+  }
   const showModalNegative = () => {
-    setState({ open: true, positivie: "fail" });
-  };
+    setState({ open: true, positivie: "fail" })
+  }
   const showModalRedFlag = () => {
-    setState({ open: true, positivie: "redflag" });
-  };
+    setState({ open: true, positivie: "redflag" })
+  }
 
   const handleClose = () => {
-    setIsModalOpen(false);
-    setState({ open: false, positivie: "fail" });
-  };
+    setIsModalOpen(false)
+    setState({ open: false, positivie: "fail" })
+  }
 
-  const linklist = [];
+  const linklist = []
 
   if (m.docs && m.docs.length) {
     for (const doc of m.docs) {
       linklist.push(
         <div>
-          <a
-            href={doc.metadata.source}
-            key={doc.metadata.source}
-            target="_blank"
-            className="font-medium no-underline text-blue-500"
-          >
-            {doc.metadata.title}
-          </a>
+          <a href={doc.metadata.source} key={doc.metadata.source} target="_blank" className="font-medium no-underline text-blue-500">{doc.metadata.title}</a>
         </div>
-      );
+      )
     }
   }
 
   return (
     <div>
       <div className="flex">
-        {!m.isContacts && <div className="">{m.message}</div>}
+        {/* {!m.isContacts && <div className="">{m.message}</div>} */}
+        {!m.isContacts && <div className="">
+          <Markdown>
+            {m.message}
+          </Markdown>
+        </div>}
 
         {m.isContacts && (
           <div className="">
@@ -67,18 +63,7 @@ export function BotChatMessage(props: {
             </div>
           </div>
         )}
-
-        {!isWaiting && m.needsRebuild && (
-          <Button
-            className="mx-2 -mt-1"
-            type="primary"
-            onClick={rebuild}
-            loading={isWaiting}
-            disabled={isWaiting}
-          >
-            Rebuild
-          </Button>
-        )}
+        {!isWaiting && m.needsRebuild && <Button className="mx-2 -mt-1" type="primary" onClick={rebuild} loading={isWaiting} disabled={isWaiting}>Rebuild</Button>}
       </div>
       {m.isAnswer && (
         <div className="text-gray-400 flex gap-2 mt-2">
@@ -109,18 +94,18 @@ export function BotChatMessage(props: {
         score={state.positivie}
       />
     </div>
-  );
+  )
 }
 
 type Inputs = {
-  reporter: string;
-  sfr: string[];
-  qmf: string[];
-  redorq: "rtmf" | "qmf";
-  expectedResult: string;
-  prompttype: string;
-  moderatorresponse: string;
-};
+  reporter: string
+  sfr: string[]
+  qmf: string[]
+  redorq: "rtmf" | "qmf"
+  expectedResult: string
+  prompttype: string
+  moderatorresponse: string
+}
 
 const failOptions: SelectProps["options"] = [
   {
@@ -159,7 +144,7 @@ const failOptions: SelectProps["options"] = [
     value: "Other",
     label: "Other",
   },
-];
+]
 
 const qmf: SelectProps["options"] = [
   {
@@ -174,13 +159,13 @@ const qmf: SelectProps["options"] = [
     value: "Safety / Do no Harm",
     label: "Safety / Do no Harm",
   },
-];
+]
 
 const rating: SelectProps["options"] = [
   { value: "1", label: "1" },
   { value: "2", label: "2" },
   { value: "3", label: "3" },
-];
+]
 
 const prompttype: SelectProps["options"] = [
   {
@@ -191,7 +176,7 @@ const prompttype: SelectProps["options"] = [
     value: "synthetic",
     label: "Synthetic Prompt",
   },
-];
+]
 
 const redorq: SelectProps["options"] = [
   {
@@ -202,17 +187,17 @@ const redorq: SelectProps["options"] = [
     value: "qmf",
     label: "Quality Metric",
   },
-];
+]
 
 function BotScoreModal(props: {
-  m: ChatMessage;
-  open: boolean;
-  close: () => void;
-  score?: AI_SCORES;
+  m: ChatMessage
+  open: boolean
+  close: () => void
+  score?: AI_SCORES
 }) {
-  const { m, open, close, score } = props;
-  const { botName, id } = m;
-  const [confirmLoading, setConfirmLoading] = useState(false);
+  const { m, open, close, score } = props
+  const { botName, id } = m
+  const [confirmLoading, setConfirmLoading] = useState(false)
   const {
     register,
     handleSubmit,
@@ -223,29 +208,29 @@ function BotScoreModal(props: {
     resetField,
     getValues,
     watch,
-  } = useForm<Inputs>();
+  } = useForm<Inputs>()
 
-  const [showModeratorResponse, setShowModeratorResponse] = useState(false);
-  const [metricType, setmMtricType] = useState("rtmf");
+  const [showModeratorResponse, setShowModeratorResponse] = useState(false)
+  const [metricType, setmMtricType] = useState("rtmf")
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
       if (name == "prompttype") {
         if (value.prompttype == "user") {
-          setShowModeratorResponse(true);
+          setShowModeratorResponse(true)
         } else {
-          setShowModeratorResponse(false);
+          setShowModeratorResponse(false)
         }
       }
 
       if (value.redorq == "rtmf") {
-        setmMtricType("rtmf");
+        setmMtricType("rtmf")
       } else {
-        setmMtricType("qmf");
+        setmMtricType("qmf")
       }
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
+    })
+    return () => subscription.unsubscribe()
+  }, [watch])
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     await api.qualifyBot(
@@ -259,38 +244,38 @@ function BotScoreModal(props: {
       data.qmf || [],
       data.prompttype,
       data.moderatorresponse
-    );
-  };
+    )
+  }
 
   const handleOk = async () => {
-    setConfirmLoading(true);
-    const isOk = await trigger();
+    setConfirmLoading(true)
+    const isOk = await trigger()
 
     if (isOk) {
-      await handleSubmit(onSubmit)();
-      setConfirmLoading(false);
-      close();
+      await handleSubmit(onSubmit)()
+      setConfirmLoading(false)
+      close()
     }
 
-    setConfirmLoading(false);
-  };
+    setConfirmLoading(false)
+  }
 
   const onCloseForm = () => {
-    clearErrors();
-    resetField("expectedResult");
-    resetField("sfr");
-    resetField("qmf");
-    resetField("moderatorresponse");
-  };
+    clearErrors()
+    resetField("expectedResult")
+    resetField("sfr")
+    resetField("qmf")
+    resetField("moderatorresponse")
+  }
 
   const title =
     score == "fail"
       ? "Qualify Negative"
       : score == "pass"
-      ? "Qualify Positive"
-      : "Red Flag"; //{`${botName} - ${positive ? 'Qualify Positive' : 'Qualify Negative'}`}
-  const isFail = score == "fail" || score == "redflag";
-  const required = score == "fail";
+        ? "Qualify Positive"
+        : "Red Flag" //{`${botName} - ${positive ? 'Qualify Positive' : 'Qualify Negative'}`}
+  const isFail = score == "fail" || score == "redflag"
+  const required = score == "fail"
 
   return (
     <Modal
@@ -437,5 +422,5 @@ function BotScoreModal(props: {
         </div>
       </div>
     </Modal>
-  );
+  )
 }
