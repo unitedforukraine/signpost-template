@@ -105,6 +105,9 @@ type Inputs = {
   expectedResult: string
   prompttype: string
   moderatorresponse: string
+  traumametrics: number
+  clientmetrics: number
+  safetymetric: number
 }
 
 const failOptions: SelectProps["options"] = [
@@ -162,9 +165,9 @@ const qmf: SelectProps["options"] = [
 ]
 
 const rating: SelectProps["options"] = [
-  { value: "1", label: "1" },
-  { value: "2", label: "2" },
-  { value: "3", label: "3" },
+  { value: 1, label: "1" },
+  { value: 2, label: "2" },
+  { value: 3, label: "3" },
 ]
 
 const prompttype: SelectProps["options"] = [
@@ -233,18 +236,22 @@ function BotScoreModal(props: {
   }, [watch])
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    await api.qualifyBot(
+
+    await api.qualifyBot({
       id,
       score,
-      data.reporter,
-      data.expectedResult,
-      m.question,
-      m.message,
-      data.sfr || [],
-      data.qmf || [],
-      data.prompttype,
-      data.moderatorresponse
-    )
+      reporter: data.reporter,
+      result: data.expectedResult,
+      question: m.question,
+      answer: m.message,
+      failtype: data.sfr || [],
+      qualitymetrics: data.qmf || [],
+      prompttype: data.prompttype,
+      moderatorresponse: data.moderatorresponse,
+      clientmetrics: data.clientmetrics,
+      safetymetric: data.safetymetric,
+      traumametrics: data.traumametrics,
+    })
   }
 
   const handleOk = async () => {
@@ -266,6 +273,9 @@ function BotScoreModal(props: {
     resetField("sfr")
     resetField("qmf")
     resetField("moderatorresponse")
+    resetField("safetymetric")
+    resetField("traumametrics")
+    resetField("clientmetrics")
   }
 
   const title =
@@ -273,7 +283,8 @@ function BotScoreModal(props: {
       ? "Qualify Negative"
       : score == "pass"
         ? "Qualify Positive"
-        : "Red Flag" //{`${botName} - ${positive ? 'Qualify Positive' : 'Qualify Negative'}`}
+        : "Red Flag"
+
   const isFail = score == "fail" || score == "redflag"
   const required = score == "fail"
 
@@ -285,9 +296,10 @@ function BotScoreModal(props: {
       onCancel={close}
       afterClose={onCloseForm}
       confirmLoading={confirmLoading}
-      destroyOnClose
-    >
+      destroyOnClose>
+
       <div className="flex flex-col gap-4 p-4">
+
         <div>
           <div className="font-medium mb-1">Reporter</div>
           <Controller
@@ -301,27 +313,25 @@ function BotScoreModal(props: {
           )}
         </div>
 
-        {
-          <div>
-            <div className="font-medium mb-1">Metric Flag Type</div>
-            <Controller
-              name="redorq"
-              control={control}
-              rules={{ required }}
-              render={({ field }) => (
-                <Select
-                  className="w-full"
-                  placeholder="Please select"
-                  options={redorq}
-                  {...field}
-                />
-              )}
-            />
-            {required && errors.sfr && (
-              <span className="text-red-500">This field is required</span>
+        <div>
+          <div className="font-medium mb-1">Metric Flag Type</div>
+          <Controller
+            name="redorq"
+            control={control}
+            rules={{ required }}
+            render={({ field }) => (
+              <Select
+                className="w-full"
+                placeholder="Please select"
+                options={redorq}
+                {...field}
+              />
             )}
-          </div>
-        }
+          />
+          {required && errors.sfr && (
+            <span className="text-red-500">This field is required</span>
+          )}
+        </div>
 
         {metricType == "rtmf" && (
           <div>
@@ -353,29 +363,44 @@ function BotScoreModal(props: {
             <div className="font-medium mb-1">
               {isFail ? "Quality Metric Flag" : "Quality Team Objective"}
             </div>
-            {qmf.map((metric, index) => (
-              <div key={index} className="mb-2">
-                <div className="mb-1">{metric.label}</div>
-                <Controller
-                  name={`qmf.${index}`}
-                  control={control}
-                  rules={{ required: metricType == "qmf" }}
-                  render={({ field }) => (
-                    <Select
-                      className="w-full"
-                      placeholder="Select Rating"
-                      options={rating}
-                      {...field}
-                    />
-                  )}
-                />
-                {errors.qmf && metricType == "qmf" && (
-                  <span className="text-red-500">This field is required</span>
-                )}
-              </div>
-            ))}
+
+            <div className="mb-2">
+              <div className="mb-1">Trauma Informed</div>
+              <Controller
+                name="traumametrics"
+                control={control}
+                rules={{ required: metricType == "qmf" }}
+                render={({ field }) => <Select className="w-full" placeholder="Select Rating" options={rating} {...field} />}
+              />
+              {errors.traumametrics && metricType == "qmf" && (<span className="text-red-500">This field is required</span>)}
+            </div>
+
+            <div className="mb-2">
+              <div className="mb-1">Client Centered</div>
+              <Controller
+                name="clientmetrics"
+                control={control}
+                rules={{ required: metricType == "qmf" }}
+                render={({ field }) => <Select className="w-full" placeholder="Select Rating" options={rating} {...field} />}
+              />
+              {errors.clientmetrics && metricType == "qmf" && (<span className="text-red-500">This field is required</span>)}
+            </div>
+
+            <div className="mb-2">
+              <div className="mb-1">Safety / Do no Harm</div>
+              <Controller
+                name="safetymetric"
+                control={control}
+                rules={{ required: metricType == "qmf" }}
+                render={({ field }) => <Select className="w-full" placeholder="Select Rating" options={rating} {...field} />}
+              />
+              {errors.safetymetric && metricType == "qmf" && (<span className="text-red-500">This field is required</span>)}
+            </div>
+
+
           </div>
         )}
+
 
         <div>
           <div className="font-medium mb-1">Prompt Type</div>
