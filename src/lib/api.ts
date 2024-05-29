@@ -56,20 +56,7 @@ export const api = {
     return answer
   },
 
-  async qualifyBot(id: number, score: AI_SCORES, reporter: string, result: string, question: string, answer: string, failtype: string[], qualitymetrics: string[], prompttype: string, moderatorresponse: string) {
-
-    const r = {
-      id,
-      score,
-      reporter,
-      result,
-      question,
-      answer,
-      failtype,
-      qualitymetrics,
-      prompttype,
-      moderatorresponse,
-    }
+  async qualifyBot(r: BotQualification) {
 
     let options = {
       method: "POST",
@@ -78,14 +65,13 @@ export const api = {
     }
 
     try {
-      console.log(r)
-
       await fetch(`${serverurl}/qualifybot/`, options).then(r => r.json())
     } catch (error) {
       console.log("Error Scoring Bot", error)
     }
 
   },
+
 
 }
 

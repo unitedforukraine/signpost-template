@@ -39,4 +39,22 @@ declare global {
     message: string
   }
 
+  interface BotQualification {
+    id: number
+    score?: AI_SCORES
+    reporter?: string
+    result?: string
+    question?: string
+    answer?: string
+    failtype?: string[]
+    qualitymetrics?: string[]
+    prompttype?: string
+    moderatorresponse?: string
+
+    traumametrics?: number
+    clientmetrics?: number
+    safetymetric?: number
+  }
+
+
 }
